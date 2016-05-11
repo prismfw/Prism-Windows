@@ -198,6 +198,24 @@ namespace Prism.Windows
         }
 
         /// <summary>
+        /// Gets a <see cref="global::Windows.Foundation.Rect"/> from a <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="rect">The rectangle.</param>
+        public static global::Windows.Foundation.Rect GetRectangle(this Rectangle rect)
+        {
+            return new global::Windows.Foundation.Rect(rect.X, rect.Y, rect.Width, rect.Height);
+        }
+
+        /// <summary>
+        /// Gets a <see cref="Rectangle"/> from a <see cref="global::Windows.Foundation.Rect"/>.
+        /// </summary>
+        /// <param name="rect">The rectangle.</param>
+        public static Rectangle GetRectangle(this global::Windows.Foundation.Rect rect)
+        {
+            return new Rectangle(rect.X, rect.Y, rect.Width, rect.Height);
+        }
+
+        /// <summary>
         /// Gets a <see cref="global::Windows.Foundation.Size"/> from a <see cref="Size"/>.
         /// </summary>
         /// <param name="size">The size.</param>
