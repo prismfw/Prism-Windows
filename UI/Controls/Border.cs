@@ -20,6 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 using System;
+using System.Linq;
+using Prism.Input;
 using Prism.Native;
 using Prism.UI;
 using Prism.UI.Media;
@@ -39,6 +41,26 @@ namespace Prism.Windows.UI.Controls
         /// Occurs when this instance has been attached to the visual tree and is ready to be rendered.
         /// </summary>
         public new event EventHandler Loaded;
+
+        /// <summary>
+        /// Occurs when the system loses track of the pointer for some reason.
+        /// </summary>
+        public new event EventHandler<PointerEventArgs> PointerCanceled;
+
+        /// <summary>
+        /// Occurs when the pointer has moved while over the element.
+        /// </summary>
+        public new event EventHandler<PointerEventArgs> PointerMoved;
+
+        /// <summary>
+        /// Occurs when the pointer has been pressed while over the element.
+        /// </summary>
+        public new event EventHandler<PointerEventArgs> PointerPressed;
+
+        /// <summary>
+        /// Occurs when the pointer has been released while over the element.
+        /// </summary>
+        public new event EventHandler<PointerEventArgs> PointerReleased;
 
         /// <summary>
         /// Occurs when a property value changes.
@@ -148,13 +170,14 @@ namespace Prism.Windows.UI.Controls
         /// </summary>
         public object Child
         {
-            get { return Element.Child; }
+            get { return Canvas.Children.FirstOrDefault(); }
             set
             {
                 var child = value as UIElement;
-                if (child != Element.Child)
+                if (child != Canvas.Children.FirstOrDefault())
                 {
-                    Element.Child = child;
+                    Canvas.Children.Clear();
+                    Canvas.Children.Add(child);
                     OnPropertyChanged(Prism.UI.Controls.Border.ChildProperty);
                 }
             }
@@ -248,12 +271,22 @@ namespace Prism.Windows.UI.Controls
         protected global::Windows.UI.Xaml.Controls.Border Element { get; }
 
         /// <summary>
+        /// Gets the UI element that contains the child of the border.
+        /// </summary>
+        protected global::Windows.UI.Xaml.Controls.Canvas Canvas { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Border"/> class.
         /// </summary>
         public Border()
         {
             Content = (Element = new global::Windows.UI.Xaml.Controls.Border()
             {
+                Child = (Canvas = new Canvas()
+                {
+                    HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Stretch,
+                    VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Stretch
+                }),
                 HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Stretch,
                 VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Stretch
             });
@@ -263,6 +296,30 @@ namespace Prism.Windows.UI.Controls
                 IsLoaded = true;
                 OnPropertyChanged(Prism.UI.Visual.IsLoadedProperty);
                 Loaded(this, EventArgs.Empty);
+            };
+
+            base.PointerCanceled += (o, e) =>
+            {
+                e.Handled = true;
+                PointerCanceled(this, e.GetPointerEventArgs(this));
+            };
+
+            base.PointerMoved += (o, e) =>
+            {
+                e.Handled = true;
+                PointerMoved(this, e.GetPointerEventArgs(this));
+            };
+
+            base.PointerPressed += (o, e) =>
+            {
+                e.Handled = true;
+                PointerPressed(this, e.GetPointerEventArgs(this));
+            };
+
+            base.PointerReleased += (o, e) =>
+            {
+                e.Handled = true;
+                PointerReleased(this, e.GetPointerEventArgs(this));
             };
 
             base.Unloaded += (o, e) =>

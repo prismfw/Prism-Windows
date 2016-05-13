@@ -22,11 +22,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #pragma warning disable 419
 
 using System.Linq;
+using Prism.Input;
 using Prism.Native;
 using Prism.Systems;
 using Prism.Windows.UI.Media;
+using Windows.Devices.Input;
 using Windows.System.Power;
 using Windows.UI.Text;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace Prism.Windows
@@ -176,6 +180,37 @@ namespace Prism.Windows
         public static Point GetPoint(this global::Windows.Foundation.Point point)
         {
             return new Point(point.X, point.Y);
+        }
+
+        /// <summary>
+        /// Generates a <see cref="PointerEventArgs"/> from a <see cref="PointerRoutedEventArgs"/>.
+        /// </summary>
+        /// <param name="args">The event args.</param>
+        /// <param name="source">The source of the event.</param>
+        public static PointerEventArgs GetPointerEventArgs(this PointerRoutedEventArgs args, UIElement source)
+        {
+            var pointerPoint = args.GetCurrentPoint(source);
+            return new PointerEventArgs(source, args.Pointer.PointerDeviceType.GetPointerType(), pointerPoint.Position.GetPoint(),
+                pointerPoint.Properties.Pressure * 2, (long)(pointerPoint.Timestamp / 1000));
+        }
+
+        /// <summary>
+        /// Gets a <see cref="PointerType"/> from a <see cref="PointerDeviceType"/>.
+        /// </summary>
+        /// <param name="type">The pointer type.</param>
+        public static PointerType GetPointerType(this PointerDeviceType type)
+        {
+            switch (type)
+            {
+                case PointerDeviceType.Touch:
+                    return PointerType.Touch;
+                case PointerDeviceType.Pen:
+                    return PointerType.Stylus;
+                case PointerDeviceType.Mouse:
+                    return PointerType.Mouse;
+                default:
+                    return PointerType.Unknown;
+            }
         }
 
         /// <summary>
