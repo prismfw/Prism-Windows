@@ -166,6 +166,14 @@ namespace Prism.Windows
         }
 
         /// <summary>
+        /// Gets the size of a popup when presented with the default style.
+        /// </summary>
+        public Size PopupSize
+        {
+            get { return new Size(640, 640); }
+        }
+
+        /// <summary>
         /// Gets the preferred amount of space between the right edge of a UI element and the right edge of its parent.
         /// </summary>
         public double RightMargin

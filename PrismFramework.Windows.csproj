@@ -166,7 +166,7 @@
     <Compile Include="UI\Media\FontFamily.cs" />
     <Compile Include="UI\Media\Fonts.cs" />
     <Compile Include="UI\LoadIndicator.cs" />
-    <Compile Include="UI\ModalWindow.cs" />
+    <Compile Include="UI\Popup.cs" />
     <Compile Include="UI\Views\ContentView.cs" />
     <Compile Include="UI\Views\SplitView.cs" />
     <Compile Include="UI\Views\ViewStack.cs" />

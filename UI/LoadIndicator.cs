@@ -25,7 +25,6 @@ using Prism.UI.Media;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
 
 namespace Prism.Windows.UI
 {
@@ -173,7 +172,7 @@ namespace Prism.Windows.UI
         }
         private readonly ProgressRing progressRing;
 
-        private readonly Popup popup;
+        private readonly global::Windows.UI.Xaml.Controls.Primitives.Popup popup;
         private readonly StackPanel panel;
 
         /// <summary>
@@ -209,7 +208,7 @@ namespace Prism.Windows.UI
             };
             Children.Add(panel);
 
-            popup = new Popup()
+            popup = new global::Windows.UI.Xaml.Controls.Primitives.Popup()
             {
                 Child = this,
                 HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Center,

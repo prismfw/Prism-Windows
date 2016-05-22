@@ -27,7 +27,6 @@ using System.Linq;
 using Prism.Native;
 using Prism.UI.Media;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
 
 namespace Prism.Windows.UI.Controls
 {
@@ -301,7 +300,9 @@ namespace Prism.Windows.UI.Controls
 
         private void SetOverflowBackground()
         {
-            var presenter = (this.GetChild<Popup>(e => e.Name == "OverflowPopup")?.Child as global::Windows.UI.Xaml.Controls.Panel)?.GetChild<CommandBarOverflowPresenter>();
+            var presenter = (this.GetChild<global::Windows.UI.Xaml.Controls.Primitives.Popup>(e => e.Name == "OverflowPopup")?
+                .Child as global::Windows.UI.Xaml.Controls.Panel)?.GetChild<CommandBarOverflowPresenter>();
+
             if (presenter != null)
             {
                 presenter.Background = base.Background;
