@@ -71,7 +71,7 @@ namespace Prism.Windows
         {
             if (typeof(T) == typeof(INativeWindow))
             {
-                var window = ObjectRetriever.GetNativeObject(Prism.UI.Window.MainWindow) as INativeWindow;
+                var window = ObjectRetriever.GetNativeObject(Prism.UI.Window.Current) as INativeWindow;
                 if (window != null && window.Content == child && (predicate == null || predicate.Invoke((T)window)))
                 {
                     return (T)window;

@@ -61,22 +61,22 @@ namespace Prism.Windows.UI.Media.Imaging
                 });
             }
 
-            var content = Prism.UI.Window.MainWindow.Content;
+            var content = Prism.UI.Window.Current.Content;
             try
             {
                 var target = new RenderTargetBitmap();
 
-                Prism.UI.Window.MainWindow.Content = grid;
+                Prism.UI.Window.Current.Content = grid;
                 await target.RenderAsync(grid, width, height);
-                Prism.UI.Window.MainWindow.Content = content;
+                Prism.UI.Window.Current.Content = content;
 
                 return new Prism.UI.Media.Imaging.ImageSource((await target.GetPixelsAsync()).ToArray());
             }
             finally
             {
-                if (Prism.UI.Window.MainWindow.Content != content)
+                if (Prism.UI.Window.Current.Content != content)
                 {
-                    Prism.UI.Window.MainWindow.Content = content;
+                    Prism.UI.Window.Current.Content = content;
                 }
             }
         }

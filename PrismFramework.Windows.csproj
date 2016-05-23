@@ -171,7 +171,7 @@
     <Compile Include="UI\Views\SplitView.cs" />
     <Compile Include="UI\Views\ViewStack.cs" />
     <Compile Include="UI\VisualTreeHelper.cs" />
-    <Compile Include="UI\MainWindow.cs" />
+    <Compile Include="UI\Window.cs" />
     <Compile Include="WindowsInitializer.cs" />
     <Content Include="Properties\PrismFramework.Windows.rd.xml" />
   </ItemGroup>

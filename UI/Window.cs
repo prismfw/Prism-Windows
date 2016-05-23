@@ -25,18 +25,19 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Prism.Native;
 using Prism.UI;
-using Prism.Utilities;
+using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace Prism.Windows.UI
 {
     /// <summary>
-    /// Represents a Windows implementation for a main <see cref="INativeWindow"/>.
+    /// Represents a Windows implementation for an <see cref="INativeWindow"/>.
     /// </summary>
-    [Register(typeof(INativeWindow), Name = "main")]
-    public class MainWindow : INativeWindow
+    [Register(typeof(INativeWindow))]
+    public class Window : INativeWindow
     {
         /// <summary>
         /// Occurs when the window is brought to the foreground.
@@ -73,7 +74,6 @@ namespace Prism.Windows.UI
         public double Height
         {
             get { return global::Windows.UI.Xaml.Window.Current.Bounds.Height; }
-            set { Logger.Warn("Setting window height is not supported on this platform.  Ignoring."); }
         }
 
         /// <summary>
@@ -85,20 +85,49 @@ namespace Prism.Windows.UI
         }
 
         /// <summary>
+        /// Gets or sets the style for the window.
+        /// </summary>
+        public WindowStyle Style
+        {
+            get
+            {
+                if (ApplicationView.GetForCurrentView().IsFullScreenMode)
+                {
+                    return WindowStyle.FullScreen;
+                }
+
+                return CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar ? WindowStyle.Chromeless : WindowStyle.Normal;
+            }
+            set
+            {
+                CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = value == WindowStyle.Chromeless;
+
+                var view = ApplicationView.GetForCurrentView();
+                if (value == WindowStyle.FullScreen && !view.IsFullScreenMode)
+                {
+                    view.TryEnterFullScreenMode();
+                }
+                else if (value != WindowStyle.FullScreen && view.IsFullScreenMode)
+                {
+                    view.ExitFullScreenMode();
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets the width of the window.
         /// </summary>
         public double Width
         {
             get { return global::Windows.UI.Xaml.Window.Current.CoreWindow.Bounds.Width; }
-            set { Logger.Warn("Setting window width is not supported on this platform.  Ignoring."); }
         }
 
         private Size currentSize;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MainWindow"/> class.
+        /// Initializes a new instance of the <see cref="Window"/> class.
         /// </summary>
-        public MainWindow()
+        public Window()
         {
             global::Windows.UI.Xaml.Window.Current.CoreWindow.Activated += (o, e) =>
             {
@@ -125,7 +154,7 @@ namespace Prism.Windows.UI
         /// <summary>
         /// Attempts to close the window.
         /// </summary>
-        public void Close(Animate animate)
+        public void Close()
         {
             var args = new CancelEventArgs();
             Closing(this, args);
@@ -137,9 +166,18 @@ namespace Prism.Windows.UI
         }
 
         /// <summary>
+        /// Sets the preferred minimum size of the window.
+        /// </summary>
+        /// <param name="minSize">The preferred minimum size.</param>
+        public void SetPreferredMinSize(Size minSize)
+        {
+            ApplicationView.GetForCurrentView().SetPreferredMinSize(minSize.GetSize());
+        }
+
+        /// <summary>
         /// Displays the window if it is not already visible.
         /// </summary>
-        public void Show(Animate animate)
+        public void Show()
         {
             if (!global::Windows.UI.Xaml.Window.Current.Visible)
             {
@@ -155,6 +193,16 @@ namespace Prism.Windows.UI
             var target = new RenderTargetBitmap();
             await target.RenderAsync(null);
             return new Prism.UI.Media.Imaging.ImageSource((await target.GetPixelsAsync()).ToArray());
+        }
+
+        /// <summary>
+        /// Attempts to resize the window to the specified size.
+        /// </summary>
+        /// <param name="newSize">The width and height at which to size the window.</param>
+        /// <returns><c>true</c> if the window was successfully resized; otherwise, <c>false</c>.</returns>
+        public bool TryResize(Size newSize)
+        {
+            return ApplicationView.GetForCurrentView().TryResizeView(newSize.GetSize());
         }
     }
 }

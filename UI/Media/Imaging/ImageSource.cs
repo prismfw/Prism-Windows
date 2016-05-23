@@ -157,7 +157,7 @@ namespace Prism.Windows.UI.Media.Imaging
             // However, RenderTargetBitmap only works if it's a part of the view hierarchy.
             // So, we set the MainWindow's content to the bitmap, render it, and then reset the content, hopefully fast enough that no one notices.
             // If anyone knows of a better way, please let us know!
-            var content = Prism.UI.Window.MainWindow.Content;
+            var content = Prism.UI.Window.Current.Content;
             try
             {
                 file = await folder.CreateFileAsync(Path.GetFileName(filePath), CreationCollisionOption.ReplaceExisting);
@@ -165,13 +165,13 @@ namespace Prism.Windows.UI.Media.Imaging
                 {
                     var image = new global::Windows.UI.Xaml.Controls.Image() { Source = BitmapImage };
 
-                    Prism.UI.Window.MainWindow.Content = image;
+                    Prism.UI.Window.Current.Content = image;
 
                     var bitmap = new RenderTargetBitmap();
                     await bitmap.RenderAsync(image, BitmapImage.PixelWidth, BitmapImage.PixelHeight);
 
                     // Reset the content as soon as possible.
-                    Prism.UI.Window.MainWindow.Content = content;
+                    Prism.UI.Window.Current.Content = content;
 
                     var pixels = await bitmap.GetPixelsAsync();
 
@@ -186,9 +186,9 @@ namespace Prism.Windows.UI.Media.Imaging
             finally
             {
                 // This is to ensure that the content is reset even if an error is thrown.
-                if (Prism.UI.Window.MainWindow.Content != content)
+                if (Prism.UI.Window.Current.Content != content)
                 {
-                    Prism.UI.Window.MainWindow.Content = content;
+                    Prism.UI.Window.Current.Content = content;
                 }
             }
         }

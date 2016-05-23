@@ -72,7 +72,7 @@ namespace Prism.Windows.UI
         /// <returns>The parent object of the child, or <c>null</c> if no parent is found.</returns>
         public object GetParent(object reference)
         {
-            var window = ObjectRetriever.GetNativeObject(Prism.UI.Window.MainWindow) as INativeWindow;
+            var window = ObjectRetriever.GetNativeObject(Prism.UI.Window.Current) as INativeWindow;
             if (window != null && window.Content == reference)
             {
                 return window;
