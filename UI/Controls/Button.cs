@@ -325,7 +325,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != imageSource)
                 {
                     imageSource = value;
-                    image.Source = imageSource.GetImage();
+                    image.Source = imageSource.GetImageSource();
                     OnPropertyChanged(Prism.UI.Controls.Button.ImageProperty);
                 }
             }

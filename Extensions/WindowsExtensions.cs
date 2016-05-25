@@ -21,11 +21,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #pragma warning disable 419
 
-using System.Linq;
 using Prism.Input;
 using Prism.Native;
 using Prism.Systems;
 using Prism.Windows.UI.Media;
+using Prism.Windows.UI.Media.Imaging;
 using Windows.Devices.Input;
 using Windows.System.Power;
 using Windows.UI.Text;
@@ -57,7 +57,7 @@ namespace Prism.Windows
             {
                 return new global::Windows.UI.Xaml.Media.ImageBrush()
                 {
-                    ImageSource = ((INativeImageSource)ObjectRetriever.GetNativeObject(imageBrush.Image)).GetImage(),
+                    ImageSource = ((INativeImageSource)ObjectRetriever.GetNativeObject(imageBrush.Image)).GetImageSource(),
                     Stretch = imageBrush.Stretch.GetStretch()
                 };
             }
@@ -82,35 +82,6 @@ namespace Prism.Windows
                 }
 
                 return retval;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Gets a <see cref="Prism.UI.Media.Brush"/> from a <see cref="global::Windows.UI.Xaml.Media.Brush"/>.
-        /// </summary>
-        /// <param name="brush">The brush.</param>
-        public static Prism.UI.Media.Brush GetBrush(this global::Windows.UI.Xaml.Media.Brush brush)
-        {
-            var solidColor = brush as global::Windows.UI.Xaml.Media.SolidColorBrush;
-            if (solidColor != null)
-            {
-                return new Prism.UI.Media.SolidColorBrush(solidColor.Color.GetColor());
-            }
-
-            var imageBrush = brush as global::Windows.UI.Xaml.Media.ImageBrush;
-            if (imageBrush != null)
-            {
-                var bmp = imageBrush.ImageSource as BitmapImage;
-                return bmp == null ? null : new Prism.UI.Media.ImageBrush(bmp.UriSource, imageBrush.Stretch.GetStretch());
-            }
-
-            var linearBrush = brush as global::Windows.UI.Xaml.Media.LinearGradientBrush;
-            if (linearBrush != null)
-            {
-                return new Prism.UI.Media.LinearGradientBrush(linearBrush.StartPoint.GetPoint(), linearBrush.EndPoint.GetPoint(),
-                    linearBrush.GradientStops.Select(gs => gs.Color.GetColor()).ToArray());
             }
 
             return null;
@@ -158,10 +129,10 @@ namespace Prism.Windows
         /// Gets a <see cref="BitmapImage"/> from an <see cref="INativeImageSource"/>.
         /// </summary>
         /// <param name="source">The image.</param>
-        public static BitmapImage GetImage(this INativeImageSource source)
+        public static global::Windows.UI.Xaml.Media.ImageSource GetImageSource(this INativeImageSource source)
         {
-            var image = source as Prism.Windows.UI.Media.Imaging.ImageSource;
-            return image == null ? (object)source as BitmapImage : image.BitmapImage;
+            var image = source as IImageSource;
+            return image == null ? (object)source as global::Windows.UI.Xaml.Media.ImageSource : image.Source;
         }
 
         /// <summary>

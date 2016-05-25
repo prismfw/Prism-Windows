@@ -46,10 +46,10 @@ namespace Prism.Windows.UI.Media.Imaging
         {
             if (images.Length == 0)
             {
-                return new Prism.UI.Media.Imaging.ImageSource(new byte[0]);
+                return new Prism.UI.Media.Imaging.BitmapImage(new byte[0]);
             }
 
-            var bitmaps = images.Select(i => i.GetImage());
+            var bitmaps = images.Select(i => i.GetImageSource());
             var grid = new Grid();
             foreach (var bitmap in bitmaps)
             {
@@ -70,7 +70,7 @@ namespace Prism.Windows.UI.Media.Imaging
                 await target.RenderAsync(grid, width, height);
                 Prism.UI.Window.Current.Content = content;
 
-                return new Prism.UI.Media.Imaging.ImageSource((await target.GetPixelsAsync()).ToArray());
+                return new Prism.UI.Media.Imaging.BitmapImage((await target.GetPixelsAsync()).ToArray());
             }
             finally
             {

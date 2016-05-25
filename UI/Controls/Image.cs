@@ -164,7 +164,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != source)
                 {
                     source = value;
-                    Element.Source = source.GetImage();
+                    Element.Source = source.GetImageSource();
                     OnPropertyChanged(Prism.UI.Controls.Image.SourceProperty);
                 }
             }
@@ -279,7 +279,7 @@ namespace Prism.Windows.UI.Controls
         /// <returns>The desired size as a <see cref="Size"/> instance.</returns>
         public Size Measure(Size constraints)
         {
-            if (source == null || !source.IsLoaded)
+            if (source == null || !((source as INativeBitmapImage)?.IsLoaded ?? true))
             {
                 return Size.Empty;
             }
