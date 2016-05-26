@@ -64,7 +64,7 @@ namespace Prism.Windows.UI.Media.Imaging
             var content = Prism.UI.Window.Current.Content;
             try
             {
-                var target = new RenderTargetBitmap();
+                var target = new global::Windows.UI.Xaml.Media.Imaging.RenderTargetBitmap();
 
                 Prism.UI.Window.Current.Content = grid;
                 await target.RenderAsync(grid, width, height);

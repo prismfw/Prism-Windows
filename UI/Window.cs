@@ -20,16 +20,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 using System;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading.Tasks;
 using Prism.Native;
 using Prism.UI;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Media.Imaging;
 
 namespace Prism.Windows.UI
 {
@@ -183,16 +179,6 @@ namespace Prism.Windows.UI
             {
                 global::Windows.UI.Xaml.Window.Current.Activate();
             }
-        }
-
-        /// <summary>
-        /// Captures the contents of the window in an image and returns the result.
-        /// </summary>
-        public async Task<Prism.UI.Media.Imaging.ImageSource> TakeScreenshotAsync()
-        {
-            var target = new RenderTargetBitmap();
-            await target.RenderAsync(null);
-            return new Prism.UI.Media.Imaging.ImageSource((await target.GetPixelsAsync()).ToArray());
         }
 
         /// <summary>

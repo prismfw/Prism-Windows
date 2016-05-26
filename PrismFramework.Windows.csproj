@@ -133,6 +133,7 @@
     <Compile Include="UI\Controls\MenuButton.cs" />
     <Compile Include="UI\Controls\ViewStackHeader.cs" />
     <Compile Include="UI\Media\Imaging\ImageSource.cs" />
+    <Compile Include="UI\Media\Imaging\RenderTargetBitmap.cs" />
     <Compile Include="UI\StatusBar.cs" />
     <Compile Include="UI\Media\AudioPlayer.cs" />
     <Compile Include="UI\Media\Imaging\ImageCompositor.cs" />
