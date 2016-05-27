@@ -41,7 +41,7 @@ namespace Prism.Windows.IO
         /// </summary>
         public string AssetDirectory
         {
-            get { return Package.Current.InstalledLocation.Path + "\\Assets\\"; }
+            get { return "ms-appx:///Assets/"; }
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace Prism.Windows.IO
         /// </summary>
         public string TempDirectory
         {
-            get { return ApplicationData.Current.TemporaryFolder.Path; }
+            get { return ApplicationData.Current.TemporaryFolder.Path + '\\'; }
         }
 
         /// <summary>
