@@ -29,6 +29,7 @@ using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.Storage.Streams;
+using Windows.Graphics.Display;
 
 namespace Prism.Windows.UI.Media.Imaging
 {
@@ -43,7 +44,7 @@ namespace Prism.Windows.UI.Media.Imaging
         /// </summary>
         public int PixelHeight
         {
-            get { return (int)Math.Ceiling(renderTarget.PixelHeight / Prism.Systems.Device.Current.DisplayScale); }
+            get { return renderTarget.PixelHeight; }
         }
 
         /// <summary>
@@ -51,7 +52,15 @@ namespace Prism.Windows.UI.Media.Imaging
         /// </summary>
         public int PixelWidth
         {
-            get { return (int)Math.Ceiling(renderTarget.PixelWidth / Prism.Systems.Device.Current.DisplayScale); }
+            get { return renderTarget.PixelWidth; }
+        }
+
+        /// <summary>
+        /// Gets the scaling factor of the image.
+        /// </summary>
+        public double Scale
+        {
+            get { return DisplayInformation.GetForCurrentView().RawPixelsPerViewPixel; }
         }
 
         /// <summary>

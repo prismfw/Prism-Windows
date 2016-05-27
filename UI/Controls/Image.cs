@@ -228,8 +228,8 @@ namespace Prism.Windows.UI.Controls
 
             Element.ImageOpened += (o, e) =>
             {
-                frame.Width = source.PixelWidth;
-                frame.Height = source.PixelHeight;
+                frame.Width = source.PixelWidth / source.Scale;
+                frame.Height = source.PixelHeight / source.Scale;
                 InvalidateMeasure();
             };
 
@@ -285,16 +285,18 @@ namespace Prism.Windows.UI.Controls
             }
 
             double scale = 1;
-            if (constraints.Width < source.PixelWidth)
+            double width = source.PixelWidth / source.Scale;
+            double height = source.PixelHeight / source.Scale;
+            if (constraints.Width < width)
             {
-                scale = constraints.Width / source.PixelWidth;
+                scale = constraints.Width / width;
             }
-            if (constraints.Height < source.PixelHeight)
+            if (constraints.Height < height)
             {
-                scale = Math.Min(scale, constraints.Height / source.PixelHeight);
+                scale = Math.Min(scale, constraints.Height / height);
             }
 
-            return new Size(source.PixelWidth * scale, source.PixelHeight * scale);
+            return new Size(width * scale, height * scale);
         }
 
         /// <summary>

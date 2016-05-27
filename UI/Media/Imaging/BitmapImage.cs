@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Prism.UI.Media.Imaging;
@@ -28,6 +29,7 @@ using Prism.Native;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.UI.Xaml;
+using Windows.Storage.Streams;
 
 namespace Prism.Windows.UI.Media.Imaging
 {
@@ -74,6 +76,14 @@ namespace Prism.Windows.UI.Media.Imaging
         }
 
         /// <summary>
+        /// Gets the scaling factor of the image.
+        /// </summary>
+        public double Scale
+        {
+            get { return bitmapImage.DecodePixelWidth == 0 ? 1 : bitmapImage.PixelWidth / (double)bitmapImage.DecodePixelWidth; }
+        }
+
+        /// <summary>
         /// Gets the image source instance.
         /// </summary>
         public global::Windows.UI.Xaml.Media.ImageSource Source
@@ -87,6 +97,7 @@ namespace Prism.Windows.UI.Media.Imaging
         public Uri SourceUri { get; private set; }
 
         private readonly global::Windows.UI.Xaml.Media.Imaging.BitmapImage bitmapImage;
+        private readonly byte[] imageBytes;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BitmapImage"/> class.
@@ -107,12 +118,15 @@ namespace Prism.Windows.UI.Media.Imaging
             if (bitmapImage == null)
             {
                 bitmapImage = new global::Windows.UI.Xaml.Media.Imaging.BitmapImage();
+                bitmapImage.CreateOptions = global::Windows.UI.Xaml.Media.Imaging.BitmapCreateOptions.IgnoreImageCache;
+                bitmapImage.DecodePixelType = global::Windows.UI.Xaml.Media.Imaging.DecodePixelType.Physical;
             }
 
             bitmapImage.ImageOpened -= OnImageLoaded;
             bitmapImage.ImageOpened += OnImageLoaded;
             bitmapImage.ImageFailed -= OnImageFailed;
             bitmapImage.ImageFailed += OnImageFailed;
+
             bitmapImage.UriSource = sourceUri;
         }
 
@@ -122,6 +136,7 @@ namespace Prism.Windows.UI.Media.Imaging
         /// <param name="imageData">The byte array containing the data for the image.</param>
         public BitmapImage(byte[] imageData)
         {
+            imageBytes = imageData;
             bitmapImage = new global::Windows.UI.Xaml.Media.Imaging.BitmapImage();
 
             bitmapImage.ImageOpened -= OnImageLoaded;
@@ -130,7 +145,7 @@ namespace Prism.Windows.UI.Media.Imaging
             bitmapImage.ImageFailed += OnImageFailed;
             
             // attempting to wait on this causes a deadlock
-            var task = bitmapImage.SetSourceAsync(imageData.AsBuffer().AsStream().AsRandomAccessStream());
+            var task = bitmapImage.SetSourceAsync(imageBytes.AsBuffer().AsStream().AsRandomAccessStream());
         }
 
         /// <summary>
@@ -156,44 +171,28 @@ namespace Prism.Windows.UI.Media.Imaging
                 folder = await StorageFolder.GetFolderFromPathAsync(directoryPath);
             }
 
-            // BitmapImage appears to be write-only, so we can't read the pixel data in order to write it to disk.
-            // To get around this, we're rendering the image to a RenderTargetBitmap, which lets us get at the pixels.
-            // However, RenderTargetBitmap only works if it's a part of the view hierarchy.
-            // So, we set the MainWindow's content to the bitmap, render it, and then reset the content, hopefully fast enough that no one notices.
-            // If anyone knows of a better way, please let us know!
-            var content = Prism.UI.Window.Current.Content;
-            try
+            var bitmap = new global::Windows.UI.Xaml.Media.Imaging.WriteableBitmap(bitmapImage.PixelWidth, bitmapImage.PixelHeight);
+            if (imageBytes != null)
             {
-                file = await folder.CreateFileAsync(Path.GetFileName(filePath), CreationCollisionOption.ReplaceExisting);
-                using (var stream = await file.OpenAsync(FileAccessMode.ReadWrite))
+                await bitmap.SetSourceAsync(imageBytes.AsBuffer().AsStream().AsRandomAccessStream());
+            }
+            else if (SourceUri != null)
+            {
+                using (var stream = await RandomAccessStreamReference.CreateFromUri(SourceUri).OpenReadAsync())
                 {
-                    var image = new global::Windows.UI.Xaml.Controls.Image() { Source = bitmapImage };
-
-                    Prism.UI.Window.Current.Content = image;
-
-                    var bitmap = new global::Windows.UI.Xaml.Media.Imaging.RenderTargetBitmap();
-                    await bitmap.RenderAsync(image, bitmapImage.PixelWidth, bitmapImage.PixelHeight);
-
-                    // Reset the content as soon as possible.
-                    Prism.UI.Window.Current.Content = content;
-
-                    var pixels = await bitmap.GetPixelsAsync();
-
-                    var encorder = await BitmapEncoder.CreateAsync(fileFormat == ImageFileFormat.Jpeg ? BitmapEncoder.JpegEncoderId : BitmapEncoder.PngEncoderId, stream);
-                    encorder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied, (uint)bitmapImage.PixelWidth, (uint)bitmapImage.PixelHeight,
-                        96, 96, pixels.ToArray());
-                    await encorder.FlushAsync();
-
-                    await stream.FlushAsync();
+                    await bitmap.SetSourceAsync(stream);
                 }
             }
-            finally
+
+            file = await folder.CreateFileAsync(Path.GetFileName(filePath), CreationCollisionOption.ReplaceExisting);
+            using (var stream = await file.OpenAsync(FileAccessMode.ReadWrite))
             {
-                // This is to ensure that the content is reset even if an error is thrown.
-                if (Prism.UI.Window.Current.Content != content)
-                {
-                    Prism.UI.Window.Current.Content = content;
-                }
+                var encorder = await BitmapEncoder.CreateAsync(fileFormat == ImageFileFormat.Jpeg ? BitmapEncoder.JpegEncoderId : BitmapEncoder.PngEncoderId, stream);
+                encorder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied, (uint)bitmap.PixelWidth, (uint)bitmap.PixelHeight,
+                    96, 96, bitmap.PixelBuffer.ToArray());
+                await encorder.FlushAsync();
+
+                await stream.FlushAsync();
             }
         }
 
@@ -213,8 +212,34 @@ namespace Prism.Windows.UI.Media.Imaging
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The event data.</param>
-        protected void OnImageLoaded(object sender, RoutedEventArgs e)
+        protected async void OnImageLoaded(object sender, RoutedEventArgs e)
         {
+            bitmapImage.DecodePixelHeight = 0;
+            bitmapImage.DecodePixelWidth = 0;
+
+            if (SourceUri != null)
+            {
+                try
+                {
+                    var file = await StorageFile.GetFileFromApplicationUriAsync(SourceUri);
+                    if (file != null)
+                    {
+                        int index = file.Name.LastIndexOf('.');
+                        string name = index >= 0 ? file.Name.Remove(index) : file.Name;
+
+                        index = name.LastIndexOf('.');
+                        if (index >= 0)
+                        {
+                            name = name.Substring(index + 1).Replace("scale-", "");
+                            double scale = double.Parse(name) / 100;
+                            bitmapImage.DecodePixelWidth = (int)Math.Ceiling(bitmapImage.PixelWidth / scale);
+                            bitmapImage.DecodePixelHeight = (int)Math.Ceiling(bitmapImage.PixelHeight / scale);
+                        }
+                    }
+                }
+                catch { }
+            }
+
             IsLoaded = true;
             ImageLoaded(this, EventArgs.Empty);
         }
