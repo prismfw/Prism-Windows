@@ -78,10 +78,7 @@ namespace Prism.Windows.UI.Media.Imaging
         /// <summary>
         /// Gets the scaling factor of the image.
         /// </summary>
-        public double Scale
-        {
-            get { return bitmapImage.DecodePixelWidth == 0 ? 1 : bitmapImage.PixelWidth / (double)bitmapImage.DecodePixelWidth; }
-        }
+        public double Scale { get; private set; } = 1;
 
         /// <summary>
         /// Gets the image source instance.
@@ -214,9 +211,7 @@ namespace Prism.Windows.UI.Media.Imaging
         /// <param name="e">The event data.</param>
         protected async void OnImageLoaded(object sender, RoutedEventArgs e)
         {
-            bitmapImage.DecodePixelHeight = 0;
-            bitmapImage.DecodePixelWidth = 0;
-
+            Scale = 1;
             if (SourceUri != null)
             {
                 try
@@ -231,9 +226,7 @@ namespace Prism.Windows.UI.Media.Imaging
                         if (index >= 0)
                         {
                             name = name.Substring(index + 1).Replace("scale-", "");
-                            double scale = double.Parse(name) / 100;
-                            bitmapImage.DecodePixelWidth = (int)Math.Ceiling(bitmapImage.PixelWidth / scale);
-                            bitmapImage.DecodePixelHeight = (int)Math.Ceiling(bitmapImage.PixelHeight / scale);
+                            Scale = double.Parse(name) / 100;
                         }
                     }
                 }

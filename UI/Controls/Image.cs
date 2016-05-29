@@ -119,8 +119,31 @@ namespace Prism.Windows.UI.Controls
             {
                 frame = value;
 
-                Width = Element.Width = value.Width;
-                Height = Element.Height = value.Height;
+                Width = value.Width;
+                Height = value.Height;
+                
+                if (stretch != Stretch.None && stretch != Stretch.UniformToFill)
+                {
+                    Element.Width = value.Width;
+                    Element.Height = value.Height;
+                }
+                else if (source != null && ((source as INativeBitmapImage)?.IsLoaded ?? true))
+                {
+                    if (stretch == Stretch.UniformToFill)
+                    {
+                        double width = source.PixelWidth / source.Scale;
+                        double height = source.PixelHeight / source.Scale;
+                        double scale = Math.Max(frame.Width / width, frame.Height / height);
+                        Element.Width = width * scale;
+                        Element.Height = height * scale;
+                    }
+                    else
+                    {
+                        Element.Width = source.PixelWidth / source.Scale;
+                        Element.Height = source.PixelHeight / source.Scale;
+                    }
+                }
+
                 Canvas.SetLeft(this, value.X);
                 Canvas.SetTop(this, value.Y);
             }
@@ -164,6 +187,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != source)
                 {
                     source = value;
+                    sourceHasLoaded = false;
                     Element.Source = source.GetImageSource();
                     OnPropertyChanged(Prism.UI.Controls.Image.SourceProperty);
                 }
@@ -176,17 +200,42 @@ namespace Prism.Windows.UI.Controls
         /// </summary>
         public Stretch Stretch
         {
-            get { return Element.Stretch.GetStretch(); }
+            get { return stretch; }
             set
             {
-                var stretch = value.GetStretch();
-                if (stretch != Element.Stretch)
+                if (value != stretch)
                 {
-                    Element.Stretch = stretch;
+                    stretch = value;
+                    if (stretch != Stretch.None && stretch != Stretch.UniformToFill)
+                    {
+                        Element.Stretch = stretch.GetStretch();
+                    }
+                    else
+                    {
+                        Element.Stretch = global::Windows.UI.Xaml.Media.Stretch.Uniform;
+                        if (source != null && ((source as INativeBitmapImage)?.IsLoaded ?? true))
+                        {
+                            if (stretch == Stretch.UniformToFill)
+                            {
+                                double width = source.PixelWidth / source.Scale;
+                                double height = source.PixelHeight / source.Scale;
+                                double scale = Math.Max(frame.Width / width, frame.Height / height);
+                                Element.Width = width * scale;
+                                Element.Height = height * scale;
+                            }
+                            else
+                            {
+                                Element.Width = source.PixelWidth / source.Scale;
+                                Element.Height = source.PixelHeight / source.Scale;
+                            }
+                        }
+                    }
+
                     OnPropertyChanged(Prism.UI.Controls.Image.StretchProperty);
                 }
             }
         }
+        private Stretch stretch;
 
         /// <summary>
         /// Gets or sets the display state of the element.
@@ -214,6 +263,8 @@ namespace Prism.Windows.UI.Controls
         /// </summary>
         protected global::Windows.UI.Xaml.Controls.Image Element { get; }
 
+        private bool sourceHasLoaded;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Image"/> class.
         /// </summary>
@@ -225,18 +276,13 @@ namespace Prism.Windows.UI.Controls
                 VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Center
             };
             Content = Element;
-
-            Element.ImageOpened += (o, e) =>
-            {
-                frame.Width = source.PixelWidth / source.Scale;
-                frame.Height = source.PixelHeight / source.Scale;
-                InvalidateMeasure();
-            };
+            HorizontalContentAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Center;
+            VerticalContentAlignment = global::Windows.UI.Xaml.VerticalAlignment.Center;
 
             base.Loaded += (o, e) =>
             {
                 IsLoaded = true;
-                OnPropertyChanged(Prism.UI.Visual.IsLoadedProperty);
+                OnPropertyChanged(Visual.IsLoadedProperty);
                 Loaded(this, EventArgs.Empty);
             };
 
@@ -267,7 +313,7 @@ namespace Prism.Windows.UI.Controls
             base.Unloaded += (o, e) =>
             {
                 IsLoaded = false;
-                OnPropertyChanged(Prism.UI.Visual.IsLoadedProperty);
+                OnPropertyChanged(Visual.IsLoadedProperty);
                 Unloaded(this, EventArgs.Empty);
             };
         }
@@ -304,7 +350,16 @@ namespace Prism.Windows.UI.Controls
         /// <param name="finalSize">The final area within the parent that this object should use to arrange itself and its children.</param>
         protected override global::Windows.Foundation.Size ArrangeOverride(global::Windows.Foundation.Size finalSize)
         {
-            ArrangeRequest(false, null);
+            if (!sourceHasLoaded && source != null && ((source as INativeBitmapImage)?.IsLoaded ?? true))
+            {
+                sourceHasLoaded = true;
+                ArrangeRequest(true, null);
+            }
+            else
+            {
+                ArrangeRequest(false, null);
+            }
+
             finalSize = Frame.Size.GetSize();
             base.ArrangeOverride(finalSize);
             return finalSize;
