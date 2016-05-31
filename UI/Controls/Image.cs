@@ -187,7 +187,6 @@ namespace Prism.Windows.UI.Controls
                 if (value != source)
                 {
                     source = value;
-                    sourceHasLoaded = false;
                     Element.Source = source.GetImageSource();
                     OnPropertyChanged(Prism.UI.Controls.Image.SourceProperty);
                 }
@@ -262,8 +261,6 @@ namespace Prism.Windows.UI.Controls
         /// Gets the UI element that is displaying the image.
         /// </summary>
         protected global::Windows.UI.Xaml.Controls.Image Element { get; }
-
-        private bool sourceHasLoaded;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Image"/> class.
@@ -350,16 +347,7 @@ namespace Prism.Windows.UI.Controls
         /// <param name="finalSize">The final area within the parent that this object should use to arrange itself and its children.</param>
         protected override global::Windows.Foundation.Size ArrangeOverride(global::Windows.Foundation.Size finalSize)
         {
-            if (!sourceHasLoaded && source != null && ((source as INativeBitmapImage)?.IsLoaded ?? true))
-            {
-                sourceHasLoaded = true;
-                ArrangeRequest(true, null);
-            }
-            else
-            {
-                ArrangeRequest(false, null);
-            }
-
+            ArrangeRequest(false, null);
             finalSize = Frame.Size.GetSize();
             base.ArrangeOverride(finalSize);
             return finalSize;
