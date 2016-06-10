@@ -136,6 +136,21 @@ namespace Prism.Windows
         }
 
         /// <summary>
+        /// Gets an <see cref="global::Windows.UI.Input.Inking.InkDrawingAttributes"/> from an <see cref="Prism.UI.Media.Inking.InkDrawingAttributes"/>.
+        /// </summary>
+        /// <param name="attributes">The drawing attributes.</param>
+        public static global::Windows.UI.Input.Inking.InkDrawingAttributes GetInkDrawingAttributes(this Prism.UI.Media.Inking.InkDrawingAttributes attributes)
+        {
+            return new global::Windows.UI.Input.Inking.InkDrawingAttributes()
+            {
+                Color = attributes.Color.GetColor(),
+                Size = new global::Windows.Foundation.Size(attributes.Size, attributes.Size),
+                PenTip = attributes.PenTip == Prism.UI.Media.Inking.PenTipShape.Square ?
+                    global::Windows.UI.Input.Inking.PenTipShape.Rectangle : global::Windows.UI.Input.Inking.PenTipShape.Circle,
+            };
+        }
+
+        /// <summary>
         /// Gets a <see cref="global::Windows.Foundation.Point"/> from a <see cref="Point"/>.
         /// </summary>
         /// <param name="point">The point.</param>
