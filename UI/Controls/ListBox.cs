@@ -536,7 +536,19 @@ namespace Prism.Windows.UI.Controls
         /// <returns>The desired size as a <see cref="Size"/> instance.</returns>
         public Size Measure(Size constraints)
         {
-            return constraints;
+            try
+            {
+                Width = double.NaN;
+                Height = double.NaN;
+
+                base.Visibility = global::Windows.UI.Xaml.Visibility.Visible;
+                return base.MeasureOverride(constraints.GetSize()).GetSize();
+            }
+            finally
+            {
+                base.Visibility = visibility == Prism.UI.Visibility.Visible ?
+                    global::Windows.UI.Xaml.Visibility.Visible : global::Windows.UI.Xaml.Visibility.Collapsed;
+            }
         }
 
         /// <summary>
