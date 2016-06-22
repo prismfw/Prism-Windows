@@ -35,7 +35,7 @@ namespace Prism.Windows.UI.Controls
     /// Represents a Windows implementation for an <see cref="INativeBorder"/>.
     /// </summary>
     [Register(typeof(INativeBorder))]
-    public class Border : UserControl, INativeBorder
+    public class Border : Canvas, INativeBorder
     {
         /// <summary>
         /// Occurs when this instance has been attached to the visual tree and is ready to be rendered.
@@ -123,7 +123,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != background)
                 {
                     background = value;
-                    Element.Background = background.GetBrush();
+                    base.Background = background.GetBrush();
                     OnPropertyChanged(Prism.UI.Controls.Border.BackgroundProperty);
                 }
             }
@@ -133,7 +133,7 @@ namespace Prism.Windows.UI.Controls
         /// <summary>
         /// Gets or sets the <see cref="Brush"/> with which to paint the border.
         /// </summary>
-        public new Brush BorderBrush
+        public Brush BorderBrush
         {
             get { return borderBrush; }
             set
@@ -151,13 +151,13 @@ namespace Prism.Windows.UI.Controls
         /// <summary>
         /// Gets or sets the thickness of the border.
         /// </summary>
-        public new Thickness BorderThickness
+        public Thickness BorderThickness
         {
             get { return Element.BorderThickness.GetThickness(); }
             set
             {
                 var thickness = value.GetThickness();
-                if (thickness != base.BorderThickness)
+                if (thickness != Element.BorderThickness)
                 {
                     Element.BorderThickness = thickness;
                     OnPropertyChanged(Prism.UI.Controls.Border.BorderThicknessProperty);
@@ -193,10 +193,10 @@ namespace Prism.Windows.UI.Controls
             {
                 frame = value;
 
-                Width = Element.Width = value.Width;
-                Height = Element.Height = value.Height;
-                Canvas.SetLeft(this, value.X);
-                Canvas.SetTop(this, value.Y);
+                Width = Element.Width = Canvas.Width = value.Width;
+                Height = Element.Height = Canvas.Height = value.Height;
+                SetLeft(this, value.X);
+                SetTop(this, value.Y);
             }
         }
         private Rectangle frame = new Rectangle();
@@ -230,7 +230,7 @@ namespace Prism.Windows.UI.Controls
         /// <summary>
         /// Gets or sets the padding between the border and the child element.
         /// </summary>
-        public new Thickness Padding
+        public Thickness Padding
         {
             get { return Element.Padding.GetThickness(); }
             set
@@ -273,20 +273,24 @@ namespace Prism.Windows.UI.Controls
         /// <summary>
         /// Gets the UI element that contains the child of the border.
         /// </summary>
-        protected global::Windows.UI.Xaml.Controls.Canvas Canvas { get; }
+        protected Canvas Canvas { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Border"/> class.
         /// </summary>
         public Border()
         {
-            Content = (Element = new global::Windows.UI.Xaml.Controls.Border()
+            Children.Add(Canvas = new Canvas()
             {
-                Child = (Canvas = new Canvas()
-                {
-                    HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Stretch,
-                    VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Stretch
-                }),
+                Background = new global::Windows.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Colors.Transparent),
+                HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Stretch,
+                VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Stretch,
+            });
+
+            Children.Add(Element = new global::Windows.UI.Xaml.Controls.Border()
+            {
+                Background = new global::Windows.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Colors.Transparent),
+                IsHitTestVisible = false,
                 HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Stretch,
                 VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Stretch
             });
