@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Prism.Input;
@@ -43,9 +44,14 @@ namespace Prism.Windows.UI.Controls
     public class ListBox : ListView, INativeListBox
     {
         /// <summary>
-        /// Occurs when an accessory in a list box item is selected.
+        /// Occurs when an accessory in a list box item is clicked or tapped.
         /// </summary>
-        public event EventHandler<Prism.UI.Controls.AccessorySelectedEventArgs> AccessorySelected;
+        public event EventHandler<Prism.UI.Controls.AccessoryClickedEventArgs> AccessoryClicked;
+
+        /// <summary>
+        /// Occurs when an item in the list box is clicked or tapped.
+        /// </summary>
+        public event EventHandler<Prism.UI.Controls.ItemClickedEventArgs> ItemClicked;
 
         /// <summary>
         /// Occurs when this instance has been attached to the visual tree and is ready to be rendered.
@@ -384,6 +390,7 @@ namespace Prism.Windows.UI.Controls
         }
 
         private readonly CollectionViewSource collectionSource;
+        private readonly Dictionary<INativeListBoxItem, object> itemMap = new Dictionary<INativeListBoxItem, object>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ListBox"/> class.
@@ -392,7 +399,8 @@ namespace Prism.Windows.UI.Controls
         {
             collectionSource = new CollectionViewSource();
             BindingOperations.SetBinding(this, ItemsSourceProperty, new Binding() { Source = collectionSource });
-            
+
+            IsItemClickEnabled = true;
             GroupStyle.Add(new GroupStyle() { HidesIfEmpty = false });
             ItemContainerStyle = (Style)XamlReader.Load(@"
                 <Style xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation"" TargetType=""ListViewItem"">
@@ -446,6 +454,16 @@ namespace Prism.Windows.UI.Controls
                 if (separator != null)
                 {
                     separator.Stroke = separatorBrush.GetBrush() ?? new global::Windows.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Color.FromArgb(50, 0, 0, 0));
+                }
+            };
+
+            // This only fires for new selections.  Similarly, each item's Tapped event seems to only fire for items that are already selected.
+            // Using both of these events together gives us the behavior we want, but it's a fragile setup, so be vigilant of possible problems.
+            base.ItemClick += (o, e) =>
+            {
+                if (SelectionMode != Prism.UI.Controls.SelectionMode.None)
+                {
+                    ItemClicked(this, new Prism.UI.Controls.ItemClickedEventArgs(e.ClickedItem));
                 }
             };
 
@@ -526,7 +544,17 @@ namespace Prism.Windows.UI.Controls
         /// <param name="animate">Whether to animate the deselection.</param>
         public void DeselectItem(object item, Animate animate)
         {
-            base.SelectedItems.Remove(item);
+            if (base.SelectedItems.Contains(item))
+            {
+                if (base.SelectionMode == ListViewSelectionMode.Single)
+                {
+                    base.SelectedItem = null;
+                }
+                else if (base.SelectionMode != ListViewSelectionMode.None)
+                {
+                    base.SelectedItems.Remove(item);
+                }
+            }
         }
 
         /// <summary>
@@ -623,7 +651,14 @@ namespace Prism.Windows.UI.Controls
         {
             if (!base.SelectedItems.Contains(item))
             {
-                base.SelectedItems.Add(item);
+                if (base.SelectionMode == ListViewSelectionMode.Single)
+                {
+                    base.SelectedItem = item;
+                }
+                else if (base.SelectionMode != ListViewSelectionMode.None)
+                {
+                    base.SelectedItems.Add(item);
+                }
             }
         }
 
@@ -689,6 +724,29 @@ namespace Prism.Windows.UI.Controls
             PropertyChanged(this, new FrameworkPropertyChangedEventArgs(pd));
         }
 
+        /// <summary>
+        /// Called when an item in the list box is clicked or tapped.
+        /// </summary>
+        /// <param name="item">The item that was clicked.</param>
+        protected internal void OnItemClicked(INativeListBoxItem item)
+        {
+            object value;
+            if (SelectionMode != Prism.UI.Controls.SelectionMode.None && itemMap.TryGetValue(item, out value))
+            {
+                ItemClicked(this, new Prism.UI.Controls.ItemClickedEventArgs(value));
+            }
+        }
+
+        private void OnItemUnloaded(object sender, EventArgs e)
+        {
+            var item = sender as INativeListBoxItem;
+            if (item != null)
+            {
+                item.Unloaded -= OnItemUnloaded;
+                itemMap.Remove(item);
+            }
+        }
+
         private class ListBoxHeaderConverter : IValueConverter
         {
             private readonly ListBox listBox;
@@ -721,10 +779,19 @@ namespace Prism.Windows.UI.Controls
             public object Convert(object value, Type targetType, object parameter, string language)
             {
                 var item = listBox.ItemRequest(value, null);
-                var separator = (item as global::Windows.UI.Xaml.DependencyObject)?.GetChild<Line>(c => c.Name == "separator");
-                if (separator != null)
+                if (item != null)
                 {
-                    separator.Stroke = listBox.separatorBrush.GetBrush() ?? new global::Windows.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Color.FromArgb(50, 0, 0, 0));
+                    // This is not an ideal setup, but the ListView's ItemClick event does not behave the way we need it to.
+                    // To get around it, we're relying on each item to tell the ListView when it's tapped and keeping track of which item corresponds to which value.
+                    listBox.itemMap[item] = value;
+                    item.Unloaded -= listBox.OnItemUnloaded;
+                    item.Unloaded += listBox.OnItemUnloaded;
+
+                    var separator = (item as DependencyObject)?.GetChild<Line>(c => c.Name == "separator");
+                    if (separator != null)
+                    {
+                        separator.Stroke = listBox.separatorBrush.GetBrush() ?? new global::Windows.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Color.FromArgb(50, 0, 0, 0));
+                    }
                 }
 
                 return item;

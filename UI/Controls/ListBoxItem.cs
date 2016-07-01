@@ -355,6 +355,11 @@ namespace Prism.Windows.UI.Controls
                 SetSeparatorPosition();
             };
 
+            base.Tapped += (o, e) =>
+            {
+                this.GetParent<ListBox>()?.OnItemClicked(this);
+            };
+
             base.Unloaded += (o, e) =>
             {
                 IsLoaded = false;
