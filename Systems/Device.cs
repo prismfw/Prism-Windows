@@ -66,7 +66,10 @@ namespace Prism.Windows.Systems
         /// <summary>
         /// Gets the scaling factor of the display monitor.
         /// </summary>
-        public double DisplayScale { get; }
+        public double DisplayScale
+        {
+            get { return DisplayInformation.GetForCurrentView().RawPixelsPerViewPixel; }
+        }
 
         /// <summary>
         /// Gets the form factor of the device on which the application is running.
@@ -202,15 +205,6 @@ namespace Prism.Windows.Systems
         /// </summary>
         public Device()
         {
-            try
-            {
-                DisplayScale = double.Parse(DisplayInformation.GetForCurrentView().ResolutionScale.ToString().Remove(0, 5).Remove(3, 7)) / 100;
-            }
-            catch
-            {
-                DisplayScale = 1;
-            }
-
             OSVersion = SystemVersion ?? new Version(0, 0);
             SystemVersion = null;
         }
