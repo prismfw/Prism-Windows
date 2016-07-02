@@ -104,6 +104,14 @@ namespace Prism.Windows.UI.Controls
         private Brush foreground;
 
         /// <summary>
+        /// Gets the amount that the menu is inset on top of its parent view.
+        /// </summary>
+        public Thickness Insets
+        {
+            get { return new Thickness(0, 0, 0, ActualHeight); }
+        }
+
+        /// <summary>
         /// Gets a collection of the items within the menu.
         /// </summary>
         public IList Items { get; }
@@ -251,6 +259,14 @@ namespace Prism.Windows.UI.Controls
                             control.Foreground = base.Foreground;
                         }
                     }
+                }
+            };
+
+            base.SizeChanged += (o, e) =>
+            {
+                if (e.NewSize.Height != e.PreviousSize.Height)
+                {
+                    OnPropertyChanged(Prism.UI.Controls.ActionMenu.InsetsProperty);
                 }
             };
         }
