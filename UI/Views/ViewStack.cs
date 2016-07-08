@@ -58,6 +58,16 @@ namespace Prism.Windows.UI
         public new event EventHandler Unloaded;
 
         /// <summary>
+        /// Occurs when the current view of the view stack has changed.
+        /// </summary>
+        public event EventHandler ViewChanged;
+
+        /// <summary>
+        /// Occurs when the current view of the view stack is being replaced by a different view.
+        /// </summary>
+        public event EventHandler<NativeViewStackViewChangingEventArgs> ViewChanging;
+
+        /// <summary>
         /// Gets or sets a value indicating whether animations are enabled for this instance.
         /// </summary>
         public bool AreAnimationsEnabled
@@ -246,6 +256,7 @@ namespace Prism.Windows.UI
             views.Insert(index, view);
             if (views.Last() == view)
             {
+                ViewChanging(this, new NativeViewStackViewChangingEventArgs(contentControl.Content, view));
                 contentControl.Content = view;
             }
         }
@@ -286,6 +297,7 @@ namespace Prism.Windows.UI
             }
             
             views.RemoveAt(views.Count - 1);
+            ViewChanging(this, new NativeViewStackViewChangingEventArgs(contentControl.Content, views.Last()));
             contentControl.Content = views.Last();
             return last;
         }
@@ -317,6 +329,8 @@ namespace Prism.Windows.UI
 
             var popped = views.Skip(1);
             views.RemoveRange(1, views.Count - 2);
+
+            ViewChanging(this, new NativeViewStackViewChangingEventArgs(contentControl.Content, views.Last()));
             contentControl.Content = views.Last();
             return popped.ToArray();
         }
@@ -352,6 +366,7 @@ namespace Prism.Windows.UI
             var popped = views.Skip(++index);
             views.RemoveRange(index, views.Count - index);
 
+            ViewChanging(this, new NativeViewStackViewChangingEventArgs(contentControl.Content, view));
             contentControl.Content = view;
             return popped.ToArray();
         }
@@ -364,6 +379,7 @@ namespace Prism.Windows.UI
         public void PushView(object view, Animate animate)
         {
             views.Add(view);
+            ViewChanging(this, new NativeViewStackViewChangingEventArgs(contentControl.Content, view));
             contentControl.Content = view;
         }
 
@@ -380,6 +396,7 @@ namespace Prism.Windows.UI
             views[index] = newView;
             if (index == views.Count - 1)
             {
+                ViewChanging(this, new NativeViewStackViewChangingEventArgs(oldView, newView));
                 contentControl.Content = newView;
             }
         }
@@ -424,11 +441,16 @@ namespace Prism.Windows.UI
         /// <param name="newView">The new view.</param>
         protected virtual void OnViewChanged(object oldView, object newView)
         {
-            var contentView = newView as INativeContentView;
-            if (contentView != null)
+            if (oldView != null || newView != null)
             {
-                Header.Title = contentView.Title;
-                Background = contentView.Background.GetBrush();
+                var contentView = newView as INativeContentView;
+                if (contentView != null)
+                {
+                    Header.Title = contentView.Title;
+                    Background = contentView.Background.GetBrush();
+                }
+
+                ViewChanged(this, EventArgs.Empty);
             }
         }
 
