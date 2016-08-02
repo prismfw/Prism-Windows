@@ -339,6 +339,7 @@ namespace Prism.Windows.UI.Controls
         /// </summary>
         public Label()
         {
+            HorizontalContentAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Stretch;
             Content = Element = new TextBlock()
             {
                 Foreground = ThemeResources.TextForegroundBrush,
