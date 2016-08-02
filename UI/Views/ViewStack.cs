@@ -27,6 +27,7 @@ using Prism.UI;
 using Prism.Windows.UI.Controls;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media.Animation;
 
 namespace Prism.Windows.UI
@@ -443,11 +444,20 @@ namespace Prism.Windows.UI
         {
             if (oldView != null || newView != null)
             {
+                var control = newView as Control;
+                if (control != null)
+                {
+                    SetBinding(BackgroundProperty, new Binding()
+                    {
+                        Path = new global::Windows.UI.Xaml.PropertyPath("Background"),
+                        Source = control
+                    });
+                }
+
                 var contentView = newView as INativeContentView;
                 if (contentView != null)
                 {
                     Header.Title = contentView.Title;
-                    Background = contentView.Background.GetBrush();
                 }
 
                 ViewChanged(this, EventArgs.Empty);

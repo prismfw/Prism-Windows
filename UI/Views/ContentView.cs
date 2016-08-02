@@ -96,7 +96,7 @@ namespace Prism.Windows.UI
         /// <summary>
         /// Gets or sets the background for the view.
         /// </summary>
-        public new Brush Background
+        Brush INativeContentView.Background
         {
             get { return background; }
             set
@@ -105,13 +105,6 @@ namespace Prism.Windows.UI
                 {
                     background = value;
                     base.Background = value.GetBrush() ?? ThemeResources.BackgroundBrush;
-
-                    var stack = this.GetParent<INativeViewStack>() as Panel;
-                    if (stack != null)
-                    {
-                        stack.Background = base.Background;
-                    }
-
                     OnPropertyChanged(Prism.UI.ContentView.BackgroundProperty);
                 }
             }
