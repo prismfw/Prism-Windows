@@ -132,6 +132,7 @@
     <Compile Include="UI\Controls\MenuSeparator.cs" />
     <Compile Include="UI\Controls\MenuButton.cs" />
     <Compile Include="UI\Controls\InkCanvas.cs" />
+    <Compile Include="UI\Controls\TabItem.cs" />
     <Compile Include="UI\Controls\ViewStackHeader.cs" />
     <Compile Include="UI\Media\Inking\InkStroke.cs" />
     <Compile Include="UI\Media\Imaging\ImageSource.cs" />
@@ -173,6 +174,8 @@
     <Compile Include="UI\Popup.cs" />
     <Compile Include="UI\Views\ContentView.cs" />
     <Compile Include="UI\Views\SplitView.cs" />
+    <Compile Include="UI\Views\TabbedSplitView.cs" />
+    <Compile Include="UI\Views\TabView.cs" />
     <Compile Include="UI\Views\ViewStack.cs" />
     <Compile Include="UI\VisualTreeHelper.cs" />
     <Compile Include="UI\Window.cs" />
