@@ -106,6 +106,48 @@ namespace Prism.Windows
         }
 
         /// <summary>
+        /// Gets a <see cref="global::Windows.Graphics.Display.DisplayOrientations"/> from a <see cref="Prism.UI.DisplayOrientations"/>.
+        /// </summary>
+        /// <param name="orientations">The orientations.</param>
+        public static global::Windows.Graphics.Display.DisplayOrientations GetDisplayOrientations(this Prism.UI.DisplayOrientations orientations)
+        {
+            var retval = global::Windows.Graphics.Display.DisplayOrientations.None;
+            if (orientations.HasFlag(Prism.UI.DisplayOrientations.Portrait))
+            {
+                retval |= (global::Windows.Graphics.Display.DisplayOrientations.Portrait | global::Windows.Graphics.Display.DisplayOrientations.PortraitFlipped);
+            }
+
+            if (orientations.HasFlag(Prism.UI.DisplayOrientations.Landscape))
+            {
+                retval |= (global::Windows.Graphics.Display.DisplayOrientations.Landscape | global::Windows.Graphics.Display.DisplayOrientations.LandscapeFlipped);
+            }
+
+            return retval;
+        }
+
+        /// <summary>
+        /// Gets a <see cref="Prism.UI.DisplayOrientations"/> from a <see cref="global::Windows.Graphics.Display.DisplayOrientations"/>.
+        /// </summary>
+        /// <param name="orientations">The orientations.</param>
+        public static Prism.UI.DisplayOrientations GetDisplayOrientations(this global::Windows.Graphics.Display.DisplayOrientations orientations)
+        {
+            var retval = Prism.UI.DisplayOrientations.None;
+            if (orientations.HasFlag(global::Windows.Graphics.Display.DisplayOrientations.Portrait) ||
+                orientations.HasFlag(global::Windows.Graphics.Display.DisplayOrientations.PortraitFlipped))
+            {
+                retval |= Prism.UI.DisplayOrientations.Portrait;
+            }
+
+            if (orientations.HasFlag(global::Windows.Graphics.Display.DisplayOrientations.Landscape) ||
+                orientations.HasFlag(global::Windows.Graphics.Display.DisplayOrientations.LandscapeFlipped))
+            {
+                retval |= Prism.UI.DisplayOrientations.Landscape;
+            }
+
+            return retval;
+        }
+
+        /// <summary>
         /// Gets a <see cref="Prism.UI.Media.FontStyle"/> from a <see cref="global::Windows.UI.Xaml.Controls.Control"/>.
         /// </summary>
         /// <param name="control">The control.</param>

@@ -23,9 +23,12 @@ using System;
 using Prism.Native;
 using Prism.UI;
 using Windows.ApplicationModel.Core;
+using Windows.Graphics.Display;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
+
+using DisplayOrientations = Windows.Graphics.Display.DisplayOrientations;
 
 namespace Prism.Windows.UI
 {
@@ -51,9 +54,23 @@ namespace Prism.Windows.UI
         public event EventHandler Deactivated;
 
         /// <summary>
+        /// Occurs when the orientation of the rendered content has changed.
+        /// </summary>
+        public event EventHandler<DisplayOrientationChangedEventArgs> OrientationChanged;
+
+        /// <summary>
         /// Occurs when the size of the window has changed.
         /// </summary>
         public event EventHandler<Prism.UI.WindowSizeChangedEventArgs> SizeChanged;
+
+        /// <summary>
+        /// Gets or sets the preferred orientations in which to automatically rotate the window in response to orientation changes of the physical device.
+        /// </summary>
+        public Prism.UI.DisplayOrientations AutorotationPreferences
+        {
+            get { return DisplayInformation.AutoRotationPreferences.GetDisplayOrientations(); }
+            set { DisplayInformation.AutoRotationPreferences = value.GetDisplayOrientations(); }
+        }
 
         /// <summary>
         /// Gets or sets the object that acts as the content of the window.
@@ -78,6 +95,14 @@ namespace Prism.Windows.UI
         public bool IsVisible
         {
             get { return global::Windows.UI.Xaml.Window.Current.Visible; }
+        }
+
+        /// <summary>
+        /// Gets the current orientation of the rendered content within the window.
+        /// </summary>
+        public Prism.UI.DisplayOrientations Orientation
+        {
+            get { return DisplayInformation.GetForCurrentView().CurrentOrientation.GetDisplayOrientations(); }
         }
 
         /// <summary>
@@ -135,6 +160,11 @@ namespace Prism.Windows.UI
                 {
                     Activated(this, EventArgs.Empty);
                 }
+            };
+
+            DisplayInformation.GetForCurrentView().OrientationChanged += (o, e) =>
+            {
+                OrientationChanged(this, new DisplayOrientationChangedEventArgs(o.CurrentOrientation.GetDisplayOrientations()));
             };
 
             global::Windows.UI.Xaml.Window.Current.CoreWindow.SizeChanged += (o, e) =>
