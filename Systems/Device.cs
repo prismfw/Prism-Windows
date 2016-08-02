@@ -22,11 +22,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 using System;
 using Prism.Native;
 using Prism.Systems;
+using Windows.Devices.Sensors;
 using Windows.Graphics.Display;
 using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Core;
-using Windows.System.Profile;
 using Windows.System.Power;
+using Windows.System.Profile;
 using Windows.UI.ViewManagement;
 
 namespace Prism.Windows.Systems
@@ -111,14 +112,15 @@ namespace Prism.Windows.Systems
             get { return isOrientationMonitoringEnabled; }
             set
             {
-                isOrientationMonitoringEnabled = value;
+                isOrientationMonitoringEnabled = value && orientationSensor != null;
 
-                var displayInfo = DisplayInformation.GetForCurrentView();
-                displayInfo.OrientationChanged -= OnOrientationChanged;
-
-                if (isOrientationMonitoringEnabled)
+                if (orientationSensor != null)
                 {
-                    displayInfo.OrientationChanged += OnOrientationChanged;
+                    orientationSensor.OrientationChanged -= OnOrientationChanged;
+                    if (isOrientationMonitoringEnabled)
+                    {
+                        orientationSensor.OrientationChanged += OnOrientationChanged;
+                    }
                 }
             }
         }
@@ -170,17 +172,27 @@ namespace Prism.Windows.Systems
         {
             get
             {
-                var displayInfo = DisplayInformation.GetForCurrentView();
-                switch (displayInfo.CurrentOrientation)
+                if (orientationSensor == null)
                 {
-                    case DisplayOrientations.Portrait:
-                        return DeviceOrientation.PortraitUp;
-                    case DisplayOrientations.Landscape:
-                        return DeviceOrientation.LandscapeLeft;
-                    case DisplayOrientations.LandscapeFlipped:
-                        return DeviceOrientation.LandscapeRight;
-                    case DisplayOrientations.PortraitFlipped:
-                        return DeviceOrientation.PortraitDown;
+                    return DeviceOrientation.Unknown;
+                }
+
+                // Untested!!
+                var displayInfo = DisplayInformation.GetForCurrentView();
+                switch (orientationSensor.GetCurrentOrientation())
+                {
+                    case SimpleOrientation.Faceup:
+                        return DeviceOrientation.FaceUp;
+                    case SimpleOrientation.Facedown:
+                        return DeviceOrientation.FaceDown;
+                    case SimpleOrientation.NotRotated:
+                        return displayInfo.NativeOrientation == DisplayOrientations.Landscape ? DeviceOrientation.LandscapeLeft : DeviceOrientation.PortraitUp;
+                    case SimpleOrientation.Rotated90DegreesCounterclockwise:
+                        return displayInfo.NativeOrientation == DisplayOrientations.Landscape ? DeviceOrientation.LandscapeLeft : DeviceOrientation.PortraitDown;
+                    case SimpleOrientation.Rotated180DegreesCounterclockwise:
+                        return displayInfo.NativeOrientation == DisplayOrientations.Landscape ? DeviceOrientation.LandscapeRight : DeviceOrientation.PortraitDown;
+                    case SimpleOrientation.Rotated270DegreesCounterclockwise:
+                        return displayInfo.NativeOrientation == DisplayOrientations.Landscape ? DeviceOrientation.LandscapeRight : DeviceOrientation.PortraitUp;
                     default:
                         return DeviceOrientation.Unknown;
                 }
@@ -200,6 +212,8 @@ namespace Prism.Windows.Systems
             get { return PowerManager.BatteryStatus.GetPowerSource(); }
         }
 
+        private readonly SimpleOrientationSensor orientationSensor;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Device"/> class.
         /// </summary>
@@ -207,6 +221,8 @@ namespace Prism.Windows.Systems
         {
             OSVersion = SystemVersion ?? new Version(0, 0);
             SystemVersion = null;
+
+            orientationSensor = SimpleOrientationSensor.GetDefault();
         }
 
         private void OnBatteryLevelChanged(object sender, object e)
@@ -214,7 +230,7 @@ namespace Prism.Windows.Systems
             BatteryLevelChanged(this, EventArgs.Empty);
         }
 
-        private void OnOrientationChanged(DisplayInformation sender, object e)
+        private void OnOrientationChanged(SimpleOrientationSensor sender, SimpleOrientationSensorOrientationChangedEventArgs e)
         {
             OrientationChanged(this, EventArgs.Empty);
         }
