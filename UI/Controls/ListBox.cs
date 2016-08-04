@@ -291,6 +291,22 @@ namespace Prism.Windows.UI.Controls
         public MeasureRequestHandler MeasureRequest { get; set; }
 
         /// <summary>
+        /// Gets or sets the level of opacity for the element.
+        /// </summary>
+        public new double Opacity
+        {
+            get { return base.Opacity; }
+            set
+            {
+                if (value != base.Opacity)
+                {
+                    base.Opacity = value;
+                    OnPropertyChanged(Prism.UI.Controls.Element.OpacityProperty);
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the method to invoke when this instance requests a section header in the list box.
         /// </summary>
         public ListBoxSectionHeaderRequestHandler SectionHeaderRequest { get; set; }

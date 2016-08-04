@@ -165,16 +165,16 @@ namespace Prism.Windows.UI.Controls
             get { return presenter.Children.FirstOrDefault(); }
             set
             {
-                var Element = value as UIElement;
-                if (Element != presenter.Children.FirstOrDefault())
+                var element = value as UIElement;
+                if (element != presenter.Children.FirstOrDefault())
                 {
                     if (presenter.Children.Count > 0)
                     {
-                        presenter.Children[0] = Element;
+                        presenter.Children[0] = element;
                     }
                     else
                     {
-                        presenter.Children.Add(Element);
+                        presenter.Children.Add(element);
                     }
 
                     OnPropertyChanged(Prism.UI.Controls.ScrollViewer.ContentProperty);
@@ -238,6 +238,22 @@ namespace Prism.Windows.UI.Controls
         /// Gets or sets the method to invoke when this instance requests a measurement of itself and its children.
         /// </summary>
         public MeasureRequestHandler MeasureRequest { get; set; }
+
+        /// <summary>
+        /// Gets or sets the level of opacity for the element.
+        /// </summary>
+        public new double Opacity
+        {
+            get { return base.Opacity; }
+            set
+            {
+                if (value != base.Opacity)
+                {
+                    base.Opacity = value;
+                    OnPropertyChanged(Prism.UI.Controls.Element.OpacityProperty);
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets the display state of the element.

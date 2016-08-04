@@ -344,6 +344,22 @@ namespace Prism.Windows.UI.Controls
         }
 
         /// <summary>
+        /// Gets or sets the level of opacity for the element.
+        /// </summary>
+        public new double Opacity
+        {
+            get { return base.Opacity; }
+            set
+            {
+                if (value != base.Opacity)
+                {
+                    base.Opacity = value;
+                    OnPropertyChanged(Prism.UI.Controls.Element.OpacityProperty);
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the interval between steps along the track.
         /// </summary>
         public new double StepFrequency
@@ -410,6 +426,8 @@ namespace Prism.Windows.UI.Controls
         /// </summary>
         public Slider()
         {
+            base.Background = ThemeResources.BaseMediumLowBrush;
+            base.Foreground = ThemeResources.AccentColorBrush;
             Margin = new global::Windows.UI.Xaml.Thickness();
             Padding = new global::Windows.UI.Xaml.Thickness();
 

@@ -273,6 +273,22 @@ namespace Prism.Windows.UI.Controls
         public MeasureRequestHandler MeasureRequest { get; set; }
 
         /// <summary>
+        /// Gets or sets the level of opacity for the element.
+        /// </summary>
+        public new double Opacity
+        {
+            get { return base.Opacity; }
+            set
+            {
+                if (value != base.Opacity)
+                {
+                    base.Opacity = value;
+                    OnPropertyChanged(Prism.UI.Controls.Element.OpacityProperty);
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the text of the label.
         /// </summary>
         public string Text
