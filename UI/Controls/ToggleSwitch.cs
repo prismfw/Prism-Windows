@@ -27,6 +27,7 @@ using Prism.UI;
 using Prism.UI.Media;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
+using Windows.UI.Xaml.Shapes;
 
 namespace Prism.Windows.UI.Controls
 {
@@ -319,6 +320,36 @@ namespace Prism.Windows.UI.Controls
         }
 
         /// <summary>
+        /// Gets or sets the <see cref="Brush"/> to apply to the thumb of the control.
+        /// </summary>
+        public Brush ThumbBrush
+        {
+            get { return thumbBrush; }
+            set
+            {
+                if (value != thumbBrush)
+                {
+                    thumbBrush = value;
+                    
+                    var thumb = Element.GetChild<Ellipse>(c => c.Name == "SwitchKnobOn");
+                    if (thumb != null)
+                    {
+                        thumb.Fill = thumbBrush.GetBrush() ?? ThemeResources.ChromeWhiteBrush;
+                    }
+
+                    thumb = Element.GetChild<Ellipse>(c => c.Name == "SwitchKnobOff");
+                    if (thumb != null)
+                    {
+                        thumb.Fill = thumbBrush.GetBrush() ?? ThemeResources.BaseMediumHighBrush;
+                    }
+
+                    OnPropertyChanged(Prism.UI.Controls.ToggleSwitch.ThumbBrushProperty);
+                }
+            }
+        }
+        private Brush thumbBrush;
+
+        /// <summary>
         /// Gets or sets the value of the toggle switch.
         /// </summary>
         public bool Value
@@ -583,6 +614,18 @@ namespace Prism.Windows.UI.Controls
                 });
             }
 
+            var thumb = Element.GetChild<Ellipse>(c => c.Name == "SwitchKnobOn");
+            if (thumb != null)
+            {
+                thumb.Fill = thumbBrush.GetBrush() ?? ThemeResources.ChromeWhiteBrush;
+            }
+
+            thumb = Element.GetChild<Ellipse>(c => c.Name == "SwitchKnobOff");
+            if (thumb != null)
+            {
+                thumb.Fill = thumbBrush.GetBrush() ?? ThemeResources.BaseMediumHighBrush;
+            }
+
             var visualStates = global::Windows.UI.Xaml.VisualStateManager.GetVisualStateGroups(grid).FirstOrDefault(vg => vg.Name == "CommonStates");
             if (visualStates != null)
             {
@@ -592,19 +635,25 @@ namespace Prism.Windows.UI.Controls
                     var anim = new ObjectAnimationUsingKeyFrames()
                     {
                         KeyFrames =
-                    {
-                        new DiscreteObjectKeyFrame()
                         {
-                            KeyTime = KeyTime.FromTimeSpan(new TimeSpan(0)),
-                            Value = null
+                            new DiscreteObjectKeyFrame()
+                            {
+                                KeyTime = KeyTime.FromTimeSpan(new TimeSpan(0)),
+                                Value = null
+                            }
                         }
-                    }
                     };
 
                     Storyboard.SetTarget(anim, border);
                     Storyboard.SetTargetProperty(anim, "Fill");
 
                     disabled.Storyboard.Children.Add(anim);
+                }
+
+                var pointerOver = visualStates.States.FirstOrDefault(vs => vs.Name == "PointerOver");
+                if (pointerOver != null)
+                {
+                    pointerOver.Storyboard.Children.Remove(pointerOver.Storyboard.Children.FirstOrDefault(t => Storyboard.GetTargetName(t) == "SwitchKnobOff"));
                 }
             }
         }

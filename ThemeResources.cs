@@ -126,6 +126,14 @@ namespace Prism.Windows
         }
 
         /// <summary>
+        /// Gets a brush with the theme-specific color for white chrome.
+        /// </summary>
+        public static Brush ChromeWhiteBrush
+        {
+            get { return GetBrush("SystemChromeWhiteColor"); }
+        }
+
+        /// <summary>
         /// Gets a brush with the theme-specific color for text.
         /// </summary>
         public static Brush TextForegroundBrush
