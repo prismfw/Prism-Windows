@@ -290,6 +290,27 @@ namespace Prism.Windows.UI
         }
 
         /// <summary>
+        /// Gets the size and location of the bar that contains the tab items.
+        /// </summary>
+        public Rectangle TabBarFrame
+        {
+            get
+            {
+                double width = 0;
+                if ((DisplayMode == SplitViewDisplayMode.Inline || DisplayMode == SplitViewDisplayMode.CompactInline) && IsPaneOpen)
+                {
+                    width = OpenPaneLength;
+                }
+                else if (DisplayMode == SplitViewDisplayMode.CompactInline || DisplayMode == SplitViewDisplayMode.CompactOverlay)
+                {
+                    width = CompactPaneLength;
+                }
+
+                return new Rectangle(PanePlacement == SplitViewPanePlacement.Right ? ActualWidth - width : 0, 0, width, ActualHeight);
+            }
+        }
+
+        /// <summary>
         /// Gets a list of the tab items that are a part of the view.
         /// </summary>
         public IList TabItems
