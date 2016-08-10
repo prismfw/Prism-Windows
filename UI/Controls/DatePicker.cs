@@ -360,6 +360,24 @@ namespace Prism.Windows.UI.Controls
         }
 
         /// <summary>
+        /// Gets or sets transformation information that affects the rendering position of this instance.
+        /// </summary>
+        public new INativeTransform RenderTransform
+        {
+            get { return renderTransform; }
+            set
+            {
+                if (value != renderTransform)
+                {
+                    renderTransform = value;
+                    base.RenderTransform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
+                    OnPropertyChanged(Visual.RenderTransformProperty);
+                }
+            }
+        }
+        private INativeTransform renderTransform;
+
+        /// <summary>
         /// Gets or sets the selected date.
         /// </summary>
         public DateTime? SelectedDate
@@ -414,6 +432,7 @@ namespace Prism.Windows.UI.Controls
             MinHeight = 0;
             MinWidth = 0;
             Padding = new global::Windows.UI.Xaml.Thickness(9.5, 3.5, 9.5, 3.5);
+            RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
             HorizontalContentAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Center;
             VerticalContentAlignment = global::Windows.UI.Xaml.VerticalAlignment.Center;
             SetTitle();

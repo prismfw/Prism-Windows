@@ -360,6 +360,24 @@ namespace Prism.Windows.UI.Controls
         }
 
         /// <summary>
+        /// Gets or sets transformation information that affects the rendering position of this instance.
+        /// </summary>
+        public new INativeTransform RenderTransform
+        {
+            get { return renderTransform; }
+            set
+            {
+                if (value != renderTransform)
+                {
+                    renderTransform = value;
+                    base.RenderTransform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
+                    OnPropertyChanged(Visual.RenderTransformProperty);
+                }
+            }
+        }
+        private INativeTransform renderTransform;
+
+        /// <summary>
         /// Gets or sets the interval between steps along the track.
         /// </summary>
         public new double StepFrequency
@@ -430,6 +448,7 @@ namespace Prism.Windows.UI.Controls
             base.Foreground = ThemeResources.AccentColorBrush;
             Margin = new global::Windows.UI.Xaml.Thickness();
             Padding = new global::Windows.UI.Xaml.Thickness();
+            RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
 
             base.IsEnabledChanged += (o, e) =>
             {

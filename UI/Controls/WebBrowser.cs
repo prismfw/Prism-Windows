@@ -197,6 +197,24 @@ namespace Prism.Windows.UI.Controls
         }
 
         /// <summary>
+        /// Gets or sets transformation information that affects the rendering position of this instance.
+        /// </summary>
+        public new INativeTransform RenderTransform
+        {
+            get { return renderTransform; }
+            set
+            {
+                if (value != renderTransform)
+                {
+                    renderTransform = value;
+                    base.RenderTransform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
+                    OnPropertyChanged(Visual.RenderTransformProperty);
+                }
+            }
+        }
+        private INativeTransform renderTransform;
+
+        /// <summary>
         /// Gets the title of the current document.
         /// </summary>
         public string Title { get; private set; }
@@ -237,6 +255,8 @@ namespace Prism.Windows.UI.Controls
         /// </summary>
         public WebBrowser()
         {
+            RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
+
             Content = Element = new WebView()
             {
                 HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Stretch,

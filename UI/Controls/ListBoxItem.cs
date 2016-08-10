@@ -237,6 +237,24 @@ namespace Prism.Windows.UI.Controls
         }
 
         /// <summary>
+        /// Gets or sets transformation information that affects the rendering position of this instance.
+        /// </summary>
+        public new INativeTransform RenderTransform
+        {
+            get { return renderTransform; }
+            set
+            {
+                if (value != renderTransform)
+                {
+                    renderTransform = value;
+                    base.RenderTransform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
+                    OnPropertyChanged(Prism.UI.Visual.RenderTransformProperty);
+                }
+            }
+        }
+        private INativeTransform renderTransform;
+
+        /// <summary>
         /// Gets or sets the background of the item when it is selected.
         /// </summary>
         public Brush SelectedBackground
@@ -312,6 +330,7 @@ namespace Prism.Windows.UI.Controls
             Children.Add(separator);
 
             HorizontalAlignment = HorizontalAlignment.Stretch;
+            RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
 
             base.Loaded += (o, e) =>
             {

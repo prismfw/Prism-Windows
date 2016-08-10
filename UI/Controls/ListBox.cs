@@ -307,6 +307,24 @@ namespace Prism.Windows.UI.Controls
         }
 
         /// <summary>
+        /// Gets or sets transformation information that affects the rendering position of this instance.
+        /// </summary>
+        public new INativeTransform RenderTransform
+        {
+            get { return renderTransform; }
+            set
+            {
+                if (value != renderTransform)
+                {
+                    renderTransform = value;
+                    base.RenderTransform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
+                    OnPropertyChanged(Visual.RenderTransformProperty);
+                }
+            }
+        }
+        private INativeTransform renderTransform;
+
+        /// <summary>
         /// Gets or sets the method to invoke when this instance requests a section header in the list box.
         /// </summary>
         public ListBoxSectionHeaderRequestHandler SectionHeaderRequest { get; set; }
@@ -416,6 +434,7 @@ namespace Prism.Windows.UI.Controls
             collectionSource = new CollectionViewSource();
             BindingOperations.SetBinding(this, ItemsSourceProperty, new Binding() { Source = collectionSource });
 
+            RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
             IsItemClickEnabled = true;
             GroupStyle.Add(new GroupStyle() { HidesIfEmpty = false });
             ItemContainerStyle = (Style)XamlReader.Load(@"

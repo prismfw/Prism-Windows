@@ -256,6 +256,24 @@ namespace Prism.Windows.UI.Controls
         }
 
         /// <summary>
+        /// Gets or sets transformation information that affects the rendering position of this instance.
+        /// </summary>
+        public new INativeTransform RenderTransform
+        {
+            get { return renderTransform; }
+            set
+            {
+                if (value != renderTransform)
+                {
+                    renderTransform = value;
+                    base.RenderTransform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
+                    OnPropertyChanged(Visual.RenderTransformProperty);
+                }
+            }
+        }
+        private INativeTransform renderTransform;
+
+        /// <summary>
         /// Gets or sets the display state of the element.
         /// </summary>
         public new Prism.UI.Visibility Visibility
@@ -288,6 +306,8 @@ namespace Prism.Windows.UI.Controls
         /// </summary>
         public ScrollViewer()
         {
+            RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
+
             Element = new global::Windows.UI.Xaml.Controls.ScrollViewer()
             {
                 Content = (presenter = new ScrollViewerContentPresenter()),

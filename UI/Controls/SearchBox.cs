@@ -366,6 +366,24 @@ namespace Prism.Windows.UI.Controls
         }
 
         /// <summary>
+        /// Gets or sets transformation information that affects the rendering position of this instance.
+        /// </summary>
+        public new INativeTransform RenderTransform
+        {
+            get { return renderTransform; }
+            set
+            {
+                if (value != renderTransform)
+                {
+                    renderTransform = value;
+                    base.RenderTransform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
+                    OnPropertyChanged(Visual.RenderTransformProperty);
+                }
+            }
+        }
+        private INativeTransform renderTransform;
+
+        /// <summary>
         /// Gets or sets the display state of the element.
         /// </summary>
         public new Visibility Visibility
@@ -394,6 +412,7 @@ namespace Prism.Windows.UI.Controls
             Margin = new global::Windows.UI.Xaml.Thickness();
             MinHeight = 0;
             MinWidth = 0;
+            RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
 
             base.IsEnabledChanged += (o, e) =>
             {

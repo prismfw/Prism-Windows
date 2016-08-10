@@ -149,6 +149,7 @@ namespace Prism.Windows.UI.Controls
         {
             headerLabel = new TextBlock()
             {
+                Foreground = ThemeResources.TextForegroundBrush,
                 HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Center,
                 VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Center
             };

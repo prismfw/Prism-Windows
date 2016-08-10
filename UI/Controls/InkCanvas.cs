@@ -183,6 +183,24 @@ namespace Prism.Windows.UI.Controls
         }
 
         /// <summary>
+        /// Gets or sets transformation information that affects the rendering position of this instance.
+        /// </summary>
+        public new INativeTransform RenderTransform
+        {
+            get { return renderTransform; }
+            set
+            {
+                if (value != renderTransform)
+                {
+                    renderTransform = value;
+                    base.RenderTransform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
+                    OnPropertyChanged(Visual.RenderTransformProperty);
+                }
+            }
+        }
+        private INativeTransform renderTransform;
+
+        /// <summary>
         /// Gets the ink strokes that are on the canvas.
         /// </summary>
         public IEnumerable<INativeInkStroke> Strokes
@@ -217,6 +235,7 @@ namespace Prism.Windows.UI.Controls
         public InkCanvas()
         {
             InkPresenter.InputDeviceTypes = (global::Windows.UI.Core.CoreInputDeviceTypes)7;
+            RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
 
             base.Loaded += (o, e) =>
             {

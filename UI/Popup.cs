@@ -188,6 +188,24 @@ namespace Prism.Windows.UI
         public MeasureRequestHandler MeasureRequest { get; set; }
 
         /// <summary>
+        /// Gets or sets transformation information that affects the rendering position of this instance.
+        /// </summary>
+        public new INativeTransform RenderTransform
+        {
+            get { return renderTransform; }
+            set
+            {
+                if (value != renderTransform)
+                {
+                    renderTransform = value;
+                    base.RenderTransform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
+                    OnPropertyChanged(Visual.RenderTransformProperty);
+                }
+            }
+        }
+        private INativeTransform renderTransform;
+
+        /// <summary>
         /// Gets the UI element that is presenting the content.
         /// </summary>
         protected global::Windows.UI.Xaml.Controls.Primitives.Popup Element { get; }
@@ -200,6 +218,7 @@ namespace Prism.Windows.UI
         public Popup()
         {
             Background = ThemeResources.BackgroundBrush;
+            RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
 
             Element = new global::Windows.UI.Xaml.Controls.Primitives.Popup() { Child = this };
 

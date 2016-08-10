@@ -246,6 +246,24 @@ namespace Prism.Windows.UI
         private double preferredMasterWidthRatio;
 
         /// <summary>
+        /// Gets or sets transformation information that affects the rendering position of this instance.
+        /// </summary>
+        public new INativeTransform RenderTransform
+        {
+            get { return renderTransform; }
+            set
+            {
+                if (value != renderTransform)
+                {
+                    renderTransform = value;
+                    base.RenderTransform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
+                    OnPropertyChanged(Visual.RenderTransformProperty);
+                }
+            }
+        }
+        private INativeTransform renderTransform;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SplitView"/> class.
         /// </summary>
         public SplitView()
@@ -255,6 +273,7 @@ namespace Prism.Windows.UI
 
             DisplayMode = SplitViewDisplayMode.Inline;
             IsPaneOpen = true;
+            RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
 
             SizeChanged += (o, e) => ResizePanes(e.NewSize.GetSize());
 

@@ -193,6 +193,24 @@ namespace Prism.Windows
         }
 
         /// <summary>
+        /// Gets a <see cref="global::Windows.UI.Xaml.Media.Matrix"/> from a <see cref="Prism.UI.Media.Matrix"/>.
+        /// </summary>
+        /// <param name="matrix">The matrix.</param>
+        public static global::Windows.UI.Xaml.Media.Matrix GetMatrix(this Prism.UI.Media.Matrix matrix)
+        {
+            return new global::Windows.UI.Xaml.Media.Matrix(matrix.M11, matrix.M12, matrix.M21, matrix.M22, matrix.OffsetX, matrix.OffsetY);
+        }
+
+        /// <summary>
+        /// Gets a <see cref="Prism.UI.Media.Matrix"/> from a <see cref="global::Windows.UI.Xaml.Media.Matrix"/>.
+        /// </summary>
+        /// <param name="matrix">The matrix.</param>
+        public static Prism.UI.Media.Matrix GetMatrix(this global::Windows.UI.Xaml.Media.Matrix matrix)
+        {
+            return new Prism.UI.Media.Matrix(matrix.M11, matrix.M12, matrix.M21, matrix.M22, matrix.OffsetX, matrix.OffsetY);
+        }
+
+        /// <summary>
         /// Gets a <see cref="global::Windows.Foundation.Point"/> from a <see cref="Point"/>.
         /// </summary>
         /// <param name="point">The point.</param>

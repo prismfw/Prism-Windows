@@ -209,6 +209,24 @@ namespace Prism.Windows.UI
         }
 
         /// <summary>
+        /// Gets or sets transformation information that affects the rendering position of this instance.
+        /// </summary>
+        public new INativeTransform RenderTransform
+        {
+            get { return renderTransform; }
+            set
+            {
+                if (value != renderTransform)
+                {
+                    renderTransform = value;
+                    base.RenderTransform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
+                    OnPropertyChanged(Visual.RenderTransformProperty);
+                }
+            }
+        }
+        private INativeTransform renderTransform;
+
+        /// <summary>
         /// Gets or sets the title of the view.
         /// </summary>
         public string Title
@@ -240,6 +258,7 @@ namespace Prism.Windows.UI
         public ContentView()
         {
             base.Background = ThemeResources.BackgroundBrush;
+            RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
             HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Stretch;
             VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Stretch;
 

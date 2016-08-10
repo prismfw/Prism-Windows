@@ -179,6 +179,24 @@ namespace Prism.Windows.UI
         public MeasureRequestHandler MeasureRequest { get; set; }
 
         /// <summary>
+        /// Gets or sets transformation information that affects the rendering position of this instance.
+        /// </summary>
+        public new INativeTransform RenderTransform
+        {
+            get { return renderTransform; }
+            set
+            {
+                if (value != renderTransform)
+                {
+                    renderTransform = value;
+                    base.RenderTransform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
+                    OnPropertyChanged(Visual.RenderTransformProperty);
+                }
+            }
+        }
+        private INativeTransform renderTransform;
+
+        /// <summary>
         /// Gets or sets the zero-based index of the selected tab item.
         /// </summary>
         public int SelectedIndex
@@ -290,6 +308,7 @@ namespace Prism.Windows.UI
 
             DisplayMode = SplitViewDisplayMode.CompactOverlay;
             OpenPaneLength = 280;
+            RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
 
             base.Loaded += (o, e) =>
             {

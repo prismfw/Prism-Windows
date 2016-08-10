@@ -134,6 +134,7 @@
     <Compile Include="UI\Controls\InkCanvas.cs" />
     <Compile Include="UI\Controls\TabItem.cs" />
     <Compile Include="UI\Controls\ViewStackHeader.cs" />
+    <Compile Include="UI\Media\Transform.cs" />
     <Compile Include="UI\Media\Inking\InkStroke.cs" />
     <Compile Include="UI\Media\Imaging\ImageSource.cs" />
     <Compile Include="UI\Media\Imaging\RenderTargetBitmap.cs" />

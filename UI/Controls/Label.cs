@@ -289,6 +289,24 @@ namespace Prism.Windows.UI.Controls
         }
 
         /// <summary>
+        /// Gets or sets transformation information that affects the rendering position of this instance.
+        /// </summary>
+        public new INativeTransform RenderTransform
+        {
+            get { return renderTransform; }
+            set
+            {
+                if (value != renderTransform)
+                {
+                    renderTransform = value;
+                    base.RenderTransform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
+                    OnPropertyChanged(Visual.RenderTransformProperty);
+                }
+            }
+        }
+        private INativeTransform renderTransform;
+
+        /// <summary>
         /// Gets or sets the text of the label.
         /// </summary>
         public string Text
@@ -356,6 +374,7 @@ namespace Prism.Windows.UI.Controls
         public Label()
         {
             HorizontalContentAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Stretch;
+            RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
             Content = Element = new TextBlock()
             {
                 Foreground = ThemeResources.TextForegroundBrush,

@@ -203,6 +203,24 @@ namespace Prism.Windows.UI
         public MeasureRequestHandler MeasureRequest { get; set; }
 
         /// <summary>
+        /// Gets or sets transformation information that affects the rendering position of this instance.
+        /// </summary>
+        public new INativeTransform RenderTransform
+        {
+            get { return renderTransform; }
+            set
+            {
+                if (value != renderTransform)
+                {
+                    renderTransform = value;
+                    base.RenderTransform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
+                    OnPropertyChanged(Visual.RenderTransformProperty);
+                }
+            }
+        }
+        private INativeTransform renderTransform;
+
+        /// <summary>
         /// Gets a collection of the views that are currently a part of the stack.
         /// </summary>
         public IEnumerable<object> Views
@@ -230,6 +248,7 @@ namespace Prism.Windows.UI
             Children.Add((Header = new ViewStackHeader()) as UIElement);
             Children.Add(contentControl);
             Orientation = global::Windows.UI.Xaml.Controls.Orientation.Vertical;
+            RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
 
             base.Loaded += (o, e) =>
             {
