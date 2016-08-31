@@ -23,7 +23,7 @@ using System;
 using System.Threading;
 using Prism.Native;
 
-namespace Prism.Windows
+namespace Prism.Windows.Utilities
 {
     /// <summary>
     /// Represents a Windows implementation of an <see cref="INativeTimer"/>.

@@ -148,7 +148,7 @@
     <Compile Include="Systems\Device.cs" />
     <Compile Include="SystemParameters.cs" />
     <Compile Include="Application.cs" />
-    <Compile Include="Timer.cs" />
+    <Compile Include="Utilities\Timer.cs" />
     <Compile Include="UI\Alert.cs" />
     <Compile Include="UI\Controls\Border.cs" />
     <Compile Include="UI\Controls\Button.cs" />
