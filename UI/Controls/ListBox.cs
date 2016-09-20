@@ -593,6 +593,24 @@ namespace Prism.Windows.UI.Controls
         }
 
         /// <summary>
+        /// Returns a collection of the <see cref="INativeListBoxItem"/> objects that are in the list.
+        /// </summary>
+        public IEnumerable<INativeListBoxItem> GetChildItems()
+        {
+            if (ItemsPanelRoot == null)
+            {
+                yield return null;
+            }
+            else
+            {
+                foreach (var item in ItemsPanelRoot.Children)
+                {
+                    yield return item.GetChild<INativeListBoxItem>();
+                }
+            }
+        }
+
+        /// <summary>
         /// Measures the object and returns its desired size.
         /// </summary>
         /// <param name="constraints">The width and height that the object is not allowed to exceed.</param>
