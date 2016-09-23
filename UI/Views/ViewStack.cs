@@ -161,6 +161,11 @@ namespace Prism.Windows.UI
         public INativeViewStackHeader Header { get; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the back button is enabled.
+        /// </summary>
+        public bool IsBackButtonEnabled { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether the header is hidden.
         /// </summary>
         public bool IsHeaderHidden

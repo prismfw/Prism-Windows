@@ -149,24 +149,6 @@ namespace Prism.Windows.UI
         private Rectangle frame = new Rectangle();
 
         /// <summary>
-        /// Gets or sets a value indicating whether the back button of an <see cref="INativeViewStack"/>
-        /// is enabled when this view is the visible view of the stack.
-        /// </summary>
-        public bool IsBackButtonEnabled
-        {
-            get { return isBackButtonEnabled; }
-            set
-            {
-                if (value != isBackButtonEnabled)
-                {
-                    isBackButtonEnabled = value;
-                    OnPropertyChanged(Prism.UI.ContentView.IsBackButtonEnabledProperty);
-                }
-            }
-        }
-        private bool isBackButtonEnabled;
-
-        /// <summary>
         /// Gets or sets a value indicating whether this instance can be considered a valid result for hit testing.
         /// </summary>
         public new bool IsHitTestVisible
