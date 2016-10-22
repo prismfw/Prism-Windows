@@ -27,7 +27,6 @@ using Prism.UI;
 using Prism.Windows.UI.Controls;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media.Animation;
 
 namespace Prism.Windows.UI
@@ -235,6 +234,7 @@ namespace Prism.Windows.UI
 
         private readonly List<object> views;
         private readonly ContentControl contentControl;
+        private long callbackToken;
         private bool isPopping;
 
         /// <summary>
@@ -468,14 +468,13 @@ namespace Prism.Windows.UI
         {
             if (oldView != null || newView != null)
             {
+                (oldView as DependencyObject)?.UnregisterPropertyChangedCallback(Control.BackgroundProperty, callbackToken);
+
                 var control = newView as Control;
                 if (control != null)
                 {
-                    SetBinding(BackgroundProperty, new Binding()
-                    {
-                        Path = new global::Windows.UI.Xaml.PropertyPath("Background"),
-                        Source = control
-                    });
+                    Background = control.Background;
+                    callbackToken = control.RegisterPropertyChangedCallback(Control.BackgroundProperty, (o, e) => { Background = ((Control)o).Background; });
                 }
 
                 var contentView = newView as INativeContentView;

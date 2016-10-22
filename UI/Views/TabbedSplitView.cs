@@ -136,16 +136,15 @@ namespace Prism.Windows.UI
                 var element = value as UIElement;
                 if (element != SplitView.Content)
                 {
-                    SplitView.Content = element;
+                    SplitView.Content?.UnregisterPropertyChangedCallback(Control.BackgroundProperty, callbackToken2);
 
-                    var control = element as Control;
+                    SplitView.Content = element;
+                    
+                    var control = SplitView.Content as Control;
                     if (control != null)
                     {
-                        SplitView.SetBinding(BackgroundProperty, new Binding()
-                        {
-                            Path = new global::Windows.UI.Xaml.PropertyPath("Background"),
-                            Source = control
-                        });
+                        SplitView.Background = control.Background;
+                        callbackToken2 = control.RegisterPropertyChangedCallback(Control.BackgroundProperty, (o2, e2) => { SplitView.Background = ((Control)o2).Background; });
                     }
                 }
             }
@@ -352,6 +351,7 @@ namespace Prism.Windows.UI
         /// </summary>
         protected global::Windows.UI.Xaml.Controls.SplitView SplitView { get; }
 
+        private long callbackToken1, callbackToken2;
         private object currentTab;
 
         /// <summary>
@@ -394,8 +394,6 @@ namespace Prism.Windows.UI
                 {
                     TabItemSelected(this, new NativeItemSelectedEventArgs(currentTab, e.ClickedItem));
                     currentTab = e.ClickedItem;
-
-                    ChangePane((e.ClickedItem as INativeTabItem)?.Content);
                 }
             };
 
@@ -406,7 +404,7 @@ namespace Prism.Windows.UI
                 TabItemSelected(this, new NativeItemSelectedEventArgs(currentTab, ListView.SelectedItem));
                 currentTab = ListView.SelectedItem;
 
-                ChangePane((ListView.SelectedItem as INativeTabItem)?.Content);
+                ChangePane((e.RemovedItems.FirstOrDefault() as INativeTabItem)?.Content, (ListView.SelectedItem as INativeTabItem)?.Content);
             };
 
             Content = SplitView = new global::Windows.UI.Xaml.Controls.SplitView()
@@ -493,18 +491,17 @@ namespace Prism.Windows.UI
             PropertyChanged(this, new FrameworkPropertyChangedEventArgs(pd));
         }
 
-        private void ChangePane(object newContent)
+        private void ChangePane(object oldContent, object newContent)
         {
+            (oldContent as DependencyObject)?.UnregisterPropertyChangedCallback(Control.BackgroundProperty, callbackToken1);
+
             SplitView.Pane = newContent as UIElement;
 
             var control = newContent as Control;
             if (control != null)
             {
-                SplitView.SetBinding(PaneBackgroundProperty, new Binding()
-                {
-                    Path = new global::Windows.UI.Xaml.PropertyPath("Background"),
-                    Source = control
-                });
+                SplitView.PaneBackground = control.Background;
+                callbackToken1 = control.RegisterPropertyChangedCallback(Control.BackgroundProperty, (o, e) => { SplitView.PaneBackground = ((Control)o).Background; });
             }
         }
 

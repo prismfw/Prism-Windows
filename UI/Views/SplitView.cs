@@ -104,16 +104,15 @@ namespace Prism.Windows.UI
                 var element = value as UIElement;
                 if (element != Content)
                 {
-                    Content = element;
+                    Content?.UnregisterPropertyChangedCallback(Control.BackgroundProperty, callbackToken2);
 
-                    var control = element as Control;
+                    Content = element;
+                    
+                    var control = Content as Control;
                     if (control != null)
                     {
-                        SetBinding(BackgroundProperty, new Binding()
-                        {
-                            Path = new global::Windows.UI.Xaml.PropertyPath("Background"),
-                            Source = control
-                        });
+                        Background = control.Background;
+                        callbackToken2 = control.RegisterPropertyChangedCallback(Control.BackgroundProperty, (o2, e2) => { Background = ((Control)o2).Background; });
                     }
                 }
             }
@@ -170,16 +169,15 @@ namespace Prism.Windows.UI
                 var element = value as UIElement;
                 if (element != Pane)
                 {
+                    Pane?.UnregisterPropertyChangedCallback(Control.BackgroundProperty, callbackToken1);
+
                     Pane = element;
 
-                    var control = element as Control;
+                    var control = Pane as Control;
                     if (control != null)
                     {
-                        SetBinding(PaneBackgroundProperty, new Binding()
-                        {
-                            Path = new global::Windows.UI.Xaml.PropertyPath("Background"),
-                            Source = control
-                        });
+                        PaneBackground = control.Background;
+                        callbackToken1 = control.RegisterPropertyChangedCallback(Control.BackgroundProperty, (o2, e2) => { PaneBackground = ((Control)o2).Background; });
                     }
                 }
             }
@@ -262,6 +260,8 @@ namespace Prism.Windows.UI
             }
         }
         private INativeTransform renderTransform;
+
+        private long callbackToken1, callbackToken2;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SplitView"/> class.

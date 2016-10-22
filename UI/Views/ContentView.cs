@@ -96,7 +96,7 @@ namespace Prism.Windows.UI
         /// <summary>
         /// Gets or sets the background for the view.
         /// </summary>
-        Brush INativeContentView.Background
+        public new Brush Background
         {
             get { return background; }
             set

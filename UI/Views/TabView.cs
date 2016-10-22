@@ -29,7 +29,6 @@ using Prism.UI.Media;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media.Animation;
 
 namespace Prism.Windows.UI
@@ -252,6 +251,7 @@ namespace Prism.Windows.UI
         /// </summary>
         protected ListView ListView { get; }
 
+        private long callbackToken;
         private object currentTab;
 
         /// <summary>
@@ -291,8 +291,6 @@ namespace Prism.Windows.UI
                 {
                     TabItemSelected(this, new NativeItemSelectedEventArgs(currentTab, e.ClickedItem));
                     currentTab = e.ClickedItem;
-
-                    ChangeContent((e.ClickedItem as INativeTabItem)?.Content);
                 }
             };
 
@@ -303,7 +301,7 @@ namespace Prism.Windows.UI
                 TabItemSelected(this, new NativeItemSelectedEventArgs(currentTab, ListView.SelectedItem));
                 currentTab = ListView.SelectedItem;
 
-                ChangeContent((ListView.SelectedItem as INativeTabItem)?.Content);
+                ChangeContent((e.RemovedItems.FirstOrDefault() as INativeTabItem)?.Content, (ListView.SelectedItem as INativeTabItem)?.Content);
             };
 
             DisplayMode = SplitViewDisplayMode.CompactOverlay;
@@ -379,18 +377,17 @@ namespace Prism.Windows.UI
             PropertyChanged(this, new FrameworkPropertyChangedEventArgs(pd));
         }
 
-        private void ChangeContent(object newContent)
+        private void ChangeContent(object oldContent, object newContent)
         {
+            (oldContent as DependencyObject)?.UnregisterPropertyChangedCallback(Control.BackgroundProperty, callbackToken);
+
             Content = newContent as UIElement;
 
             var control = newContent as Control;
             if (control != null)
             {
-                SetBinding(BackgroundProperty, new Binding()
-                {
-                    Path = new global::Windows.UI.Xaml.PropertyPath("Background"),
-                    Source = control
-                });
+                base.Background = control.Background;
+                callbackToken = control.RegisterPropertyChangedCallback(Control.BackgroundProperty, (o, e) => { base.Background = ((Control)o).Background; });
             }
         }
     }
