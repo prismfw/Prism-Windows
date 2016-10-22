@@ -255,6 +255,15 @@ namespace Prism.Windows.UI.Controls
         private INativeTransform renderTransform;
 
         /// <summary>
+        /// Gets or sets the visual theme that should be used by this instance.
+        /// </summary>
+        public new Prism.UI.Theme RequestedTheme
+        {
+            get { return base.RequestedTheme.GetTheme(); }
+            set { base.RequestedTheme = value.GetElementTheme(); }
+        }
+
+        /// <summary>
         /// Gets or sets the background of the item when it is selected.
         /// </summary>
         public Brush SelectedBackground

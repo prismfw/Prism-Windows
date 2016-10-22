@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 using System;
 using Prism.Native;
+using Prism.UI;
 using Windows.ApplicationModel.Core;
 using Windows.System;
 using Windows.UI.Core;
@@ -54,6 +55,14 @@ namespace Prism.Windows
         public event EventHandler<ErrorEventArgs> UnhandledException;
 
         /// <summary>
+        /// Gets the default theme that is used by the application.
+        /// </summary>
+        public Theme DefaultTheme
+        {
+            get { return global::Windows.UI.Xaml.Application.Current.RequestedTheme == global::Windows.UI.Xaml.ApplicationTheme.Dark ? Theme.Dark : Theme.Light; }
+        }
+
+        /// <summary>
         /// Gets the platform on which the application is running.
         /// </summary>
         public Platform Platform
@@ -66,9 +75,15 @@ namespace Prism.Windows
         /// </summary>
         public Application()
         {
-            CoreApplication.Resuming += (o, e) => Resuming(this, EventArgs.Empty);
-            CoreApplication.Suspending += (o, e) => Suspending(this, EventArgs.Empty);
             CoreApplication.Exiting += (o, e) => Exiting(this, EventArgs.Empty);
+            CoreApplication.Resuming += (o, e) => Resuming(this, EventArgs.Empty);
+            CoreApplication.Suspending += (o, e) =>
+            {
+                var deferral = e.SuspendingOperation.GetDeferral();
+                Suspending(this, EventArgs.Empty);
+                deferral.Complete();
+            };
+            
             global::Windows.UI.Xaml.Application.Current.UnhandledException += (o, e) => UnhandledException(this, new ErrorEventArgs(e.Exception));
         }
 

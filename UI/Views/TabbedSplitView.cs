@@ -61,6 +61,23 @@ namespace Prism.Windows.UI
         public new event EventHandler Unloaded;
 
         /// <summary>
+        /// Gets or sets the foreground for the button that activates the side pane.
+        /// </summary>
+        public Brush ActivationButtonForeground
+        {
+            get { return activationButtonForeground; }
+            set
+            {
+                activationButtonForeground = value;
+                if (ActivationButton != null)
+                {
+                    ActivationButton.Foreground = value.GetBrush();
+                }
+            }
+        }
+        private Brush activationButtonForeground;
+
+        /// <summary>
         /// Gets the actual width of the detail pane.
         /// </summary>
         public double ActualDetailWidth { get; private set; }
@@ -289,6 +306,15 @@ namespace Prism.Windows.UI
             }
         }
         private INativeTransform renderTransform;
+
+        /// <summary>
+        /// Gets or sets the visual theme that should be used by this instance.
+        /// </summary>
+        public new Theme RequestedTheme
+        {
+            get { return base.RequestedTheme.GetTheme(); }
+            set { base.RequestedTheme = value.GetElementTheme(); }
+        }
 
         /// <summary>
         /// Gets or sets the zero-based index of the selected tab item.

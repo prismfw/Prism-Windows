@@ -378,6 +378,15 @@ namespace Prism.Windows.UI.Controls
         private INativeTransform renderTransform;
 
         /// <summary>
+        /// Gets or sets the visual theme that should be used by this instance.
+        /// </summary>
+        public new Theme RequestedTheme
+        {
+            get { return base.RequestedTheme.GetTheme(); }
+            set { base.RequestedTheme = value.GetElementTheme(); }
+        }
+
+        /// <summary>
         /// Gets or sets the selected date.
         /// </summary>
         public DateTime? SelectedDate
@@ -389,10 +398,10 @@ namespace Prism.Windows.UI.Controls
                 {
                     var oldValue = selectedDate;
                     selectedDate = value;
-
+                    OnPropertyChanged(Prism.UI.Controls.DatePicker.SelectedDateProperty);
+                    
                     flyout.Date = new DateTimeOffset(selectedDate.HasValue ? selectedDate.Value : DateTime.Now);
 
-                    OnPropertyChanged(Prism.UI.Controls.DatePicker.SelectedDateProperty);
                     DateChanged(this, new DateChangedEventArgs(oldValue, selectedDate));
                     SetTitle();
                 }

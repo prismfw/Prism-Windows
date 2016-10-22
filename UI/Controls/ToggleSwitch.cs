@@ -338,6 +338,15 @@ namespace Prism.Windows.UI.Controls
         private INativeTransform renderTransform;
 
         /// <summary>
+        /// Gets or sets the visual theme that should be used by this instance.
+        /// </summary>
+        public new Theme RequestedTheme
+        {
+            get { return base.RequestedTheme.GetTheme(); }
+            set { base.RequestedTheme = value.GetElementTheme(); }
+        }
+
+        /// <summary>
         /// Gets or sets the <see cref="Brush"/> to apply to the thumb of the control.
         /// </summary>
         public Brush ThumbBrush

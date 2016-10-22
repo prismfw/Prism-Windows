@@ -325,6 +325,15 @@ namespace Prism.Windows.UI.Controls
         private INativeTransform renderTransform;
 
         /// <summary>
+        /// Gets or sets the visual theme that should be used by this instance.
+        /// </summary>
+        public new Theme RequestedTheme
+        {
+            get { return base.RequestedTheme.GetTheme(); }
+            set { base.RequestedTheme = value.GetElementTheme(); }
+        }
+
+        /// <summary>
         /// Gets or sets the method to invoke when this instance requests a section header in the list box.
         /// </summary>
         public ListBoxSectionHeaderRequestHandler SectionHeaderRequest { get; set; }

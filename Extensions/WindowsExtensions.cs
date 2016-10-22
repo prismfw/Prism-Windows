@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 using Prism.Input;
 using Prism.Native;
 using Prism.Systems;
+using Prism.UI;
 using Prism.Windows.UI.Media;
 using Prism.Windows.UI.Media.Imaging;
 using Windows.Devices.Input;
@@ -145,6 +146,23 @@ namespace Prism.Windows
             }
 
             return retval;
+        }
+
+        /// <summary>
+        /// Gets an <see cref="ElementTheme"/> from a <see cref="Theme"/>.
+        /// </summary>
+        /// <param name="theme">The theme.</param>
+        public static ElementTheme GetElementTheme(this Theme theme)
+        {
+            switch (theme)
+            {
+                case Theme.Dark:
+                    return ElementTheme.Dark;
+                case Theme.Light:
+                    return ElementTheme.Light;
+                default:
+                    return ElementTheme.Default;
+            }
         }
 
         /// <summary>
@@ -387,6 +405,23 @@ namespace Prism.Windows
                     return Prism.UI.TextAlignment.Justified;
                 default:
                     return Prism.UI.TextAlignment.Left;
+            }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="Theme"/> from an <see cref="ElementTheme"/>.
+        /// </summary>
+        /// <param name="theme">The theme.</param>
+        public static Theme GetTheme(this ElementTheme theme)
+        {
+            switch (theme)
+            {
+                case ElementTheme.Dark:
+                    return Theme.Dark;
+                case ElementTheme.Light:
+                    return Theme.Light;
+                default:
+                    return Theme.Default;
             }
         }
 

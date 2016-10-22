@@ -359,6 +359,15 @@ namespace Prism.Windows.UI.Controls
         private INativeTransform renderTransform;
 
         /// <summary>
+        /// Gets or sets the visual theme that should be used by this instance.
+        /// </summary>
+        public new Theme RequestedTheme
+        {
+            get { return base.RequestedTheme.GetTheme(); }
+            set { base.RequestedTheme = value.GetElementTheme(); }
+        }
+
+        /// <summary>
         /// Gets or sets the selected time.
         /// </summary>
         public TimeSpan? SelectedTime
@@ -370,10 +379,10 @@ namespace Prism.Windows.UI.Controls
                 {
                     var oldValue = selectedTime;
                     selectedTime = value;
+                    OnPropertyChanged(Prism.UI.Controls.TimePicker.SelectedTimeProperty);
 
                     flyout.Time = selectedTime.HasValue ? selectedTime.Value : DateTime.Now.TimeOfDay;
-
-                    OnPropertyChanged(Prism.UI.Controls.TimePicker.SelectedTimeProperty);
+                    
                     TimeChanged(this, new TimeChangedEventArgs(oldValue, selectedTime));
                     SetTitle();
                 }

@@ -196,6 +196,8 @@ namespace Prism.Windows.UI.Controls
                 if (value != contentDirection)
                 {
                     contentDirection = value;
+                    OnPropertyChanged(Prism.UI.Controls.Button.ContentDirectionProperty);
+
                     switch (contentDirection)
                     {
                         case ContentDirection.Down:
@@ -219,8 +221,6 @@ namespace Prism.Windows.UI.Controls
                             contentPanel.Orientation = global::Windows.UI.Xaml.Controls.Orientation.Horizontal;
                             break;
                     }
-
-                    OnPropertyChanged(Prism.UI.Controls.Button.ContentDirectionProperty);
                 }
             }
         }
@@ -417,6 +417,15 @@ namespace Prism.Windows.UI.Controls
         private INativeTransform renderTransform;
 
         /// <summary>
+        /// Gets or sets the visual theme that should be used by this instance.
+        /// </summary>
+        public new Theme RequestedTheme
+        {
+            get { return base.RequestedTheme.GetTheme(); }
+            set { base.RequestedTheme = value.GetElementTheme(); }
+        }
+
+        /// <summary>
         /// Gets or sets the title of the button.
         /// </summary>
         public string Title
@@ -452,6 +461,7 @@ namespace Prism.Windows.UI.Controls
                 }
             }
         }
+
         private Visibility visibility;
 
         private readonly StackPanel contentPanel;
