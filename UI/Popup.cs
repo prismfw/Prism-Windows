@@ -108,14 +108,10 @@ namespace Prism.Windows.UI
             get { return content; }
             set
             {
-                if (value != content)
-                {
-                    Children.Remove(content as UIElement);
+                Children.Remove(content as UIElement);
 
-                    content = value;
-                    Children.Add(content as UIElement);
-                    OnPropertyChanged(Prism.UI.Popup.ContentProperty);
-                }
+                content = value;
+                Children.Add(content as UIElement);
             }
         }
         private object content;
