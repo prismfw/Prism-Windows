@@ -182,7 +182,6 @@ namespace Prism.Windows.UI
         {
             textElement = new TextBlock()
             {
-                FontSize = Fonts.LoadIndicatorFontSize,
                 Foreground = ThemeResources.TextForegroundBrush,
                 VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Center
             };

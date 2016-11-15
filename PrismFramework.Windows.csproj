@@ -126,6 +126,7 @@
     <Compile Include="DWrite.cs" />
     <Compile Include="Extensions\ViewExtensions.cs" />
     <Compile Include="Extensions\WindowsExtensions.cs" />
+    <Compile Include="Resources.cs" />
     <Compile Include="Systems\Geolocation\Geolocator.cs" />
     <Compile Include="ThemeResources.cs" />
     <Compile Include="UI\Controls\ActionMenu.cs" />
@@ -146,7 +147,6 @@
     <Compile Include="IO\File.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Systems\Device.cs" />
-    <Compile Include="SystemParameters.cs" />
     <Compile Include="Application.cs" />
     <Compile Include="Utilities\Timer.cs" />
     <Compile Include="UI\Alert.cs" />
@@ -170,7 +170,6 @@
     <Compile Include="UI\Controls\ToggleSwitch.cs" />
     <Compile Include="UI\Controls\WebBrowser.cs" />
     <Compile Include="UI\Media\FontFamily.cs" />
-    <Compile Include="UI\Media\Fonts.cs" />
     <Compile Include="UI\LoadIndicator.cs" />
     <Compile Include="UI\Popup.cs" />
     <Compile Include="UI\Views\ContentView.cs" />
