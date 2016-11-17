@@ -347,34 +347,52 @@ namespace Prism.Windows.UI.Controls
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="Brush"/> to apply to the thumb of the control.
+        /// Gets or sets the <see cref="Brush"/> to apply to the thumb of the control when the control's value is false.
         /// </summary>
-        public Brush ThumbBrush
+        public Brush ThumbOffBrush
         {
-            get { return thumbBrush; }
+            get { return thumbOffBrush; }
             set
             {
-                if (value != thumbBrush)
+                if (value != thumbOffBrush)
                 {
-                    thumbBrush = value;
-                    
-                    var thumb = Element.GetChild<Ellipse>(c => c.Name == "SwitchKnobOn");
+                    thumbOffBrush = value;
+
+                    var thumb = Element.GetChild<Ellipse>(c => c.Name == "SwitchKnobOff");
                     if (thumb != null)
                     {
-                        thumb.Fill = thumbBrush.GetBrush() ?? ThemeResources.ChromeWhiteBrush;
+                        thumb.Fill = thumbOffBrush.GetBrush() ?? ThemeResources.BaseMediumHighBrush;
                     }
 
-                    thumb = Element.GetChild<Ellipse>(c => c.Name == "SwitchKnobOff");
-                    if (thumb != null)
-                    {
-                        thumb.Fill = thumbBrush.GetBrush() ?? ThemeResources.BaseMediumHighBrush;
-                    }
-
-                    OnPropertyChanged(Prism.UI.Controls.ToggleSwitch.ThumbBrushProperty);
+                    OnPropertyChanged(Prism.UI.Controls.ToggleSwitch.ThumbOffBrushProperty);
                 }
             }
         }
-        private Brush thumbBrush;
+        private Brush thumbOffBrush;
+
+        /// <summary>
+        /// Gets or sets the <see cref="Brush"/> to apply to the thumb of the control when the control's value is true.
+        /// </summary>
+        public Brush ThumbOnBrush
+        {
+            get { return thumbOnBrush; }
+            set
+            {
+                if (value != thumbOnBrush)
+                {
+                    thumbOnBrush = value;
+
+                    var thumb = Element.GetChild<Ellipse>(c => c.Name == "SwitchKnobOn");
+                    if (thumb != null)
+                    {
+                        thumb.Fill = thumbOnBrush.GetBrush() ?? ThemeResources.ChromeWhiteBrush;
+                    }
+
+                    OnPropertyChanged(Prism.UI.Controls.ToggleSwitch.ThumbOnBrushProperty);
+                }
+            }
+        }
+        private Brush thumbOnBrush;
 
         /// <summary>
         /// Gets or sets the value of the toggle switch.
@@ -646,13 +664,13 @@ namespace Prism.Windows.UI.Controls
             var thumb = Element.GetChild<Ellipse>(c => c.Name == "SwitchKnobOn");
             if (thumb != null)
             {
-                thumb.Fill = thumbBrush.GetBrush() ?? ThemeResources.ChromeWhiteBrush;
+                thumb.Fill = thumbOnBrush.GetBrush() ?? ThemeResources.ChromeWhiteBrush;
             }
 
             thumb = Element.GetChild<Ellipse>(c => c.Name == "SwitchKnobOff");
             if (thumb != null)
             {
-                thumb.Fill = thumbBrush.GetBrush() ?? ThemeResources.BaseMediumHighBrush;
+                thumb.Fill = thumbOffBrush.GetBrush() ?? ThemeResources.BaseMediumHighBrush;
             }
 
             var visualStates = global::Windows.UI.Xaml.VisualStateManager.GetVisualStateGroups(grid).FirstOrDefault(vg => vg.Name == "CommonStates");
