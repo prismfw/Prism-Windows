@@ -130,6 +130,7 @@
     <Compile Include="Systems\Geolocation\Geolocator.cs" />
     <Compile Include="ThemeResources.cs" />
     <Compile Include="UI\Controls\ActionMenu.cs" />
+    <Compile Include="UI\Controls\ActivityIndicator.cs" />
     <Compile Include="UI\Controls\MenuSeparator.cs" />
     <Compile Include="UI\Controls\MenuButton.cs" />
     <Compile Include="UI\Controls\InkCanvas.cs" />
