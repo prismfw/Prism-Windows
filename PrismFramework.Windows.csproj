@@ -171,7 +171,7 @@
     <Compile Include="UI\Controls\ToggleSwitch.cs" />
     <Compile Include="UI\Controls\WebBrowser.cs" />
     <Compile Include="UI\Media\FontFamily.cs" />
-    <Compile Include="UI\LoadIndicator.cs" />
+    <Compile Include="UI\Controls\LoadIndicator.cs" />
     <Compile Include="UI\Popup.cs" />
     <Compile Include="UI\Views\ContentView.cs" />
     <Compile Include="UI\Views\SplitView.cs" />
