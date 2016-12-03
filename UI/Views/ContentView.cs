@@ -36,8 +36,6 @@ namespace Prism.Windows.UI
     [Register(typeof(INativeContentView))]
     public class ContentView : Page, INativeContentView
     {
-        //private static new DependencyProperty BackgroundProperty { get; } = DependencyProperty.Register("Background", typeof(Brush), typeof(ContentView), null);
-
         /// <summary>
         /// Occurs when this instance has been attached to the visual tree and is ready to be rendered.
         /// </summary>
@@ -179,16 +177,25 @@ namespace Prism.Windows.UI
         /// </summary>
         public INativeActionMenu Menu
         {
-            get { return BottomAppBar as INativeActionMenu; }
+            get { return menu; }
             set
             {
-                if (value != BottomAppBar)
+                if (value != menu)
                 {
-                    BottomAppBar = value as AppBar;
+                    var element = menu as UIElement;
+                    if (element != null)
+                    {
+                        (this.GetParent<INativeViewStack>()?.Header as Panel)?.Children.Remove(element);
+                    }
+
+                    menu = value;
+                    AttachMenu();
+                    
                     OnPropertyChanged(Prism.UI.ContentView.MenuProperty);
                 }
             }
         }
+        private INativeActionMenu menu;
 
         /// <summary>
         /// Gets or sets transformation information that affects the rendering position of this instance.
@@ -261,6 +268,8 @@ namespace Prism.Windows.UI
                     OnPropertyChanged(Visual.IsLoadedProperty);
                     Loaded(this, EventArgs.Empty);
                 }
+
+                AttachMenu();
             };
 
             base.Unloaded += (o, e) =>
@@ -323,6 +332,21 @@ namespace Prism.Windows.UI
         protected virtual void OnPropertyChanged(PropertyDescriptor pd)
         {
             PropertyChanged(this, new FrameworkPropertyChangedEventArgs(pd));
+        }
+
+        private void AttachMenu()
+        {
+            var element = menu as UIElement;
+            if (element != null)
+            {
+                (this.GetParent<INativeViewStack>()?.Header as Panel)?.Children.Add(element);
+
+                var fwElement = element as FrameworkElement;
+                if (fwElement != null)
+                {
+                    fwElement.HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Right;
+                }
+            }
         }
     }
 }

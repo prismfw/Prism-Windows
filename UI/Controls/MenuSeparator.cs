@@ -22,7 +22,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 using System;
 using Prism.Native;
 using Prism.UI.Media;
-using Windows.UI.Xaml.Controls;
 
 namespace Prism.Windows.UI.Controls
 {
@@ -30,7 +29,7 @@ namespace Prism.Windows.UI.Controls
     /// Represents a Windows implementation for an <see cref="INativeMenuSeparator"/>.
     /// </summary>
     [Register(typeof(INativeMenuSeparator))]
-    public class MenuSeparator : AppBarSeparator, INativeMenuSeparator
+    public class MenuSeparator : INativeMenuSeparator
     {
         /// <summary>
         /// Occurs when a property value changes.
@@ -40,7 +39,7 @@ namespace Prism.Windows.UI.Controls
         /// <summary>
         /// Gets or sets the <see cref="Brush"/> to apply to the foreground content of the menu item.
         /// </summary>
-        public new Brush Foreground
+        public Brush Foreground
         {
             get { return foreground; }
             set
@@ -48,7 +47,6 @@ namespace Prism.Windows.UI.Controls
                 if (value != foreground)
                 {
                     foreground = value;
-                    base.Foreground = foreground.GetBrush() ?? this.GetParent<AppBar>()?.Foreground ?? ThemeResources.ButtonForegroundBrush;
                     OnPropertyChanged(Prism.UI.Controls.MenuItem.ForegroundProperty);
                 }
             }

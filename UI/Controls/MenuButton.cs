@@ -30,17 +30,17 @@ namespace Prism.Windows.UI.Controls
     /// Represents a Windows implementation for an <see cref="INativeMenuButton"/>.
     /// </summary>
     [Register(typeof(INativeMenuButton))]
-    public class MenuButton : AppBarButton, INativeMenuButton
+    public class MenuButton : global::Windows.UI.Xaml.Controls.Button, INativeMenuButton
     {
-        /// <summary>
-        /// Occurs when the button is clicked.
-        /// </summary>
-        public event EventHandler Clicked;
-
         /// <summary>
         /// Occurs when a property value changes.
         /// </summary>
         public event EventHandler<FrameworkPropertyChangedEventArgs> PropertyChanged;
+
+        /// <summary>
+        /// Gets or sets the action to perform when the button is pressed by the user.
+        /// </summary>
+        public Action Action { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="Brush"/> to apply to the foreground content of the menu item.
@@ -65,40 +65,64 @@ namespace Prism.Windows.UI.Controls
         /// </summary>
         public Uri ImageUri
         {
-            get { return (Icon as BitmapIcon)?.UriSource; }
+            get { return icon?.UriSource; }
             set
             {
                 if (value != ImageUri)
                 {
-                    Icon = new BitmapIcon() { UriSource = value };
+                    if (value == null)
+                    {
+                        Content = title;
+                    }
+                    else
+                    {
+                        if (icon == null)
+                        {
+                            icon = new BitmapIcon();
+                        }
+
+                        icon.UriSource = value;
+                        Content = icon;
+                    }
+
                     OnPropertyChanged(Prism.UI.Controls.MenuButton.ImageUriProperty);
                 }
             }
         }
+        private BitmapIcon icon;
 
         /// <summary>
         /// Gets or sets the title of the button.
         /// </summary>
         public string Title
         {
-            get { return Label; }
+            get { return title; }
             set
             {
-                value = value ?? string.Empty;
-                if (value != Label)
+                if (value != title)
                 {
-                    Label = value;
+                    title = value;
+                    if (ImageUri == null)
+                    {
+                        Content = title;
+                    }
+
                     OnPropertyChanged(Prism.UI.Controls.MenuButton.TitleProperty);
                 }
             }
         }
+        private string title;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MenuButton"/> class.
         /// </summary>
         public MenuButton()
         {
-            Click += (o, e) => Clicked(this, EventArgs.Empty);
+            Background = new global::Windows.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Colors.Transparent);
+            Padding = new global::Windows.UI.Xaml.Thickness(8);
+            RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
+
+            Click += (o, e) => Action();
             IsEnabledChanged += (o, e) => OnPropertyChanged(Prism.UI.Controls.MenuButton.IsEnabledProperty);
         }
 

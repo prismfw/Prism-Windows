@@ -24,9 +24,13 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Windows.Input;
 using Prism.Native;
+using Prism.UI;
 using Prism.UI.Media;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media.Animation;
 
 namespace Prism.Windows.UI.Controls
 {
@@ -34,12 +38,59 @@ namespace Prism.Windows.UI.Controls
     /// Represents a Windows implementation for an <see cref="INativeActionMenu"/>.
     /// </summary>
     [Register(typeof(INativeActionMenu))]
-    public class ActionMenu : CommandBar, INativeActionMenu
+    public class ActionMenu : StackPanel, INativeActionMenu
     {
+        /// <summary>
+        /// Occurs when this instance has been attached to the visual tree and is ready to be rendered.
+        /// </summary>
+        public new event EventHandler Loaded;
+
         /// <summary>
         /// Occurs when a property value changes.
         /// </summary>
         public event EventHandler<FrameworkPropertyChangedEventArgs> PropertyChanged;
+
+        /// <summary>
+        /// Occurs when this instance has been detached from the visual tree.
+        /// </summary>
+        public new event EventHandler Unloaded;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether animations are enabled for this instance.
+        /// </summary>
+        public bool AreAnimationsEnabled
+        {
+            get { return areAnimationsEnabled; }
+            set
+            {
+                if (value != areAnimationsEnabled)
+                {
+                    areAnimationsEnabled = value;
+                    if (areAnimationsEnabled)
+                    {
+                        Transitions = transitions;
+                        ChildrenTransitions = childrenTransitions;
+                    }
+                    else
+                    {
+                        transitions = Transitions;
+                        childrenTransitions = ChildrenTransitions;
+
+                        Transitions = null;
+                        ChildrenTransitions = null;
+                    }
+
+                    OnPropertyChanged(Visual.AreAnimationsEnabledProperty);
+                }
+            }
+        }
+        private bool areAnimationsEnabled = true;
+        private TransitionCollection transitions, childrenTransitions;
+
+        /// <summary>
+        /// Gets or sets the method to invoke when this instance requests an arrangement of its children.
+        /// </summary>
+        public ArrangeRequestHandler ArrangeRequest { get; set; }
 
         /// <summary>
         /// Gets or sets the background for the menu.
@@ -52,8 +103,12 @@ namespace Prism.Windows.UI.Controls
                 if (value != background)
                 {
                     background = value;
-                    base.Background = background.GetBrush() ?? ThemeResources.ChromeMediumBrush;
-                    SetOverflowBackground();
+                    OverflowMenu.MenuFlyoutPresenterStyle = new Style()
+                    {
+                        TargetType = typeof(MenuFlyoutPresenter),
+                        Setters = { new Setter(Control.BackgroundProperty, background.GetBrush()) }
+                    };
+
                     OnPropertyChanged(Prism.UI.Controls.ActionMenu.BackgroundProperty);
                 }
             }
@@ -80,7 +135,7 @@ namespace Prism.Windows.UI.Controls
         /// <summary>
         /// Gets or sets the <see cref="Brush"/> to apply to the foreground content of the menu.
         /// </summary>
-        public new Brush Foreground
+        public Brush Foreground
         {
             get { return foreground; }
             set
@@ -88,15 +143,18 @@ namespace Prism.Windows.UI.Controls
                 if (value != foreground)
                 {
                     foreground = value;
-                    base.Foreground = foreground.GetBrush() ?? ThemeResources.ButtonForegroundBrush;
+
+                    var brush = foreground.GetBrush() ?? ThemeResources.ButtonForegroundBrush;
+                    OverflowButton.Foreground = brush;
                     foreach (var item in Items.OfType<INativeMenuItem>().Where(i => i.Foreground == null))
                     {
                         var control = item as Control;
                         if (control != null)
                         {
-                            control.Foreground = base.Foreground;
+                            control.Foreground = brush;
                         }
                     }
+
                     OnPropertyChanged(Prism.UI.Controls.ActionMenu.ForegroundProperty);
                 }
             }
@@ -104,12 +162,30 @@ namespace Prism.Windows.UI.Controls
         private Brush foreground;
 
         /// <summary>
-        /// Gets the amount that the menu is inset on top of its parent view.
+        /// Gets or sets a <see cref="Rectangle"/> that represents the size and position of the element relative to its parent container.
         /// </summary>
-        public Thickness Insets
+        public Rectangle Frame { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance can be considered a valid result for hit testing.
+        /// </summary>
+        public new bool IsHitTestVisible
         {
-            get { return new Thickness(0, 0, 0, ActualHeight); }
+            get { return base.IsHitTestVisible; }
+            set
+            {
+                if (value != base.IsHitTestVisible)
+                {
+                    base.IsHitTestVisible = value;
+                    OnPropertyChanged(Visual.IsHitTestVisibleProperty);
+                }
+            }
         }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance has been loaded and is ready for rendering.
+        /// </summary>
+        public bool IsLoaded { get; private set; }
 
         /// <summary>
         /// Gets a collection of the items within the menu.
@@ -127,12 +203,17 @@ namespace Prism.Windows.UI.Controls
                 if (value != maxDisplayItems)
                 {
                     maxDisplayItems = value;
-                    OrganizeItems();
+                    SetButtons();
                     OnPropertyChanged(Prism.UI.Controls.ActionMenu.MaxDisplayItemsProperty);
                 }
             }
         }
         private int maxDisplayItems;
+
+        /// <summary>
+        /// Gets or sets the method to invoke when this instance requests a measurement of itself and its children.
+        /// </summary>
+        public MeasureRequestHandler MeasureRequest { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="Uri"/> of the image to use for representing the overflow menu when one is present.
@@ -145,142 +226,206 @@ namespace Prism.Windows.UI.Controls
                 if (value != overflowImageUri)
                 {
                     overflowImageUri = value;
-                    SetOverflowImage();
+                    OverflowButton.Content = overflowImageUri == null ? (object)(new SymbolIcon(Symbol.More)) : new BitmapIcon() { UriSource = overflowImageUri };
                     OnPropertyChanged(Prism.UI.Controls.ActionMenu.OverflowImageUriProperty);
                 }
             }
         }
         private Uri overflowImageUri;
 
-        private object defaultOverflowImage;
+        /// <summary>
+        /// Gets or sets transformation information that affects the rendering position of this instance.
+        /// </summary>
+        public new INativeTransform RenderTransform
+        {
+            get { return renderTransform; }
+            set
+            {
+                if (value != renderTransform)
+                {
+                    renderTransform = value;
+
+                    var transform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
+                    OverflowButton.RenderTransform = transform;
+                    foreach (var child in Items.OfType<UIElement>())
+                    {
+                        child.RenderTransform = transform;
+                    }
+
+                    OnPropertyChanged(Visual.RenderTransformProperty);
+                }
+            }
+        }
+        private INativeTransform renderTransform;
+
+        /// <summary>
+        /// Gets or sets the visual theme that should be used by this instance.
+        /// </summary>
+        public new Theme RequestedTheme
+        {
+            get { return base.RequestedTheme.GetTheme(); }
+            set { base.RequestedTheme = value.GetElementTheme(); }
+        }
+
+        /// <summary>
+        /// Gets the button that controls activation of the overflow menu.
+        /// </summary>
+        protected global::Windows.UI.Xaml.Controls.Button OverflowButton { get; }
+
+        /// <summary>
+        /// Gets the control that presents overflow content.
+        /// </summary>
+        protected MenuFlyout OverflowMenu { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ActionMenu"/> class.
         /// </summary>
         public ActionMenu()
         {
-            ClosedDisplayMode = AppBarClosedDisplayMode.Minimal;
+            Orientation = global::Windows.UI.Xaml.Controls.Orientation.Horizontal;
+
+            OverflowButton = new global::Windows.UI.Xaml.Controls.Button()
+            {
+                Background = new global::Windows.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Colors.Transparent),
+                Content = new SymbolIcon(Symbol.More),
+                Flyout = (OverflowMenu = new MenuFlyout()),
+                Padding = new global::Windows.UI.Xaml.Thickness(8),
+                RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5)
+            };
+
+            OverflowButton.Click += (o, e) =>
+            {
+                OverflowMenu.Items.Clear();
+                for (int i = maxDisplayItems; i < Items.Count; i++)
+                {
+                    var item = Items[i] as INativeMenuItem;
+                    var menuButton = item as INativeMenuButton;
+                    if (menuButton != null)
+                    {
+                        OverflowMenu.Items.Add(new MenuFlyoutItem()
+                        {
+                            Command = new MenuButtonCommand(),
+                            CommandParameter = item,
+                            Foreground = menuButton.Foreground.GetBrush() ?? foreground.GetBrush() ?? ThemeResources.ButtonForegroundBrush,
+                            IsEnabled = menuButton.IsEnabled,
+                            IsHitTestVisible = base.IsHitTestVisible,
+                            Text = menuButton.Title
+                        });
+                    }
+                    else if (item is INativeMenuSeparator)
+                    {
+                        OverflowMenu.Items.Add(new MenuFlyoutSeparator()
+                        {
+                            Background = item.Foreground.GetBrush() ?? foreground.GetBrush() ?? ThemeResources.ButtonForegroundBrush,
+                        });
+                    }
+                }
+            };
+
             Items = new ObservableCollection<INativeMenuItem>();
             ((ObservableCollection<INativeMenuItem>)Items).CollectionChanged += (o, e) =>
             {
                 switch (e.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
-                        for (int i = e.NewStartingIndex; i < e.NewItems.Count + e.NewStartingIndex; i++)
+                        if (e.NewStartingIndex < maxDisplayItems || Items.Count > maxDisplayItems && (Items.Count - e.NewItems.Count <= maxDisplayItems))
                         {
-                            if (i < maxDisplayItems)
-                            {
-                                PrimaryCommands.Insert(i, e.NewItems[i - e.NewStartingIndex] as ICommandBarElement);
-                                if (PrimaryCommands.Count > maxDisplayItems)
-                                {
-                                    var item = PrimaryCommands[PrimaryCommands.Count - 1];
-                                    PrimaryCommands.RemoveAt(PrimaryCommands.Count - 1);
-                                    SecondaryCommands.Insert(0, item);
-                                }
-                            }
-                            else
-                            {
-                                SecondaryCommands.Insert(i - maxDisplayItems, e.NewItems[i - e.NewStartingIndex] as ICommandBarElement);
-                            }
+                            SetButtons();
                         }
                         break;
                     case NotifyCollectionChangedAction.Move:
-                        for (int i = e.OldStartingIndex + e.OldItems.Count; i >= e.OldStartingIndex; i--)
+                        if (e.NewStartingIndex < maxDisplayItems || e.OldStartingIndex < maxDisplayItems)
                         {
-                            if (i < maxDisplayItems)
-                            {
-                                PrimaryCommands.RemoveAt(i);
-                            }
-                            else
-                            {
-                                SecondaryCommands.RemoveAt(i - maxDisplayItems);
-                            }
+                            SetButtons();
                         }
-
-                        for (int i = e.NewStartingIndex; i < e.NewItems.Count + e.NewStartingIndex; i++)
-                        {
-                            if (i < maxDisplayItems)
-                            {
-                                PrimaryCommands.Insert(i, e.NewItems[i - e.NewStartingIndex] as ICommandBarElement);
-                            }
-                            else
-                            {
-                                SecondaryCommands.Insert(i - maxDisplayItems, e.NewItems[i - e.NewStartingIndex] as ICommandBarElement);
-                            }
-                        }
-
-                        OrganizeItems();
                         break;
                     case NotifyCollectionChangedAction.Remove:
-                        for (int i = e.OldStartingIndex + e.OldItems.Count; i >= e.OldStartingIndex; i--)
+                        if (e.OldStartingIndex < maxDisplayItems)
                         {
-                            if (i < maxDisplayItems)
-                            {
-                                PrimaryCommands.RemoveAt(i);
-                                if (PrimaryCommands.Count < maxDisplayItems && SecondaryCommands.Count > 0)
-                                {
-                                    var item = SecondaryCommands[0];
-                                    PrimaryCommands.Add(item);
-                                    SecondaryCommands.RemoveAt(0);
-                                }
-                            }
-                            else
-                            {
-                                SecondaryCommands.RemoveAt(i - maxDisplayItems);
-                            }
+                            SetButtons();
                         }
                         break;
                     case NotifyCollectionChangedAction.Replace:
-                        for (int i = e.NewStartingIndex; i < e.NewStartingIndex + e.NewItems.Count; i++)
+                        if (e.NewStartingIndex < maxDisplayItems)
                         {
-                            if (i < maxDisplayItems)
-                            {
-                                PrimaryCommands[i] = e.NewItems[i] as ICommandBarElement;
-                            }
-                            else
-                            {
-                                SecondaryCommands[i - maxDisplayItems] = e.NewItems[i] as ICommandBarElement;
-                            }
+                            SetButtons();
                         }
                         break;
                     case NotifyCollectionChangedAction.Reset:
-                        PrimaryCommands.Clear();
-                        SecondaryCommands.Clear();
+                        Children.Clear();
+                        OverflowMenu.Items.Clear();
                         break;
                 }
 
                 if (Foreground != null && e.NewItems != null)
                 {
-                    foreach (var item in e.NewItems.OfType<INativeMenuItem>().Where(i => i.Foreground == null))
+                    var brush = Foreground.GetBrush();
+                    foreach (var item in e.NewItems.OfType<INativeMenuItem>())
                     {
-                        var control = item as Control;
-                        if (control != null)
+                        var element = item as UIElement;
+                        if (element != null)
                         {
-                            control.Foreground = base.Foreground;
+                            element.RenderTransform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
+                        }
+
+                        if (item.Foreground == null)
+                        {
+                            var control = item as Control;
+                            if (control != null)
+                            {
+                                control.Foreground = brush;
+                            }
                         }
                     }
                 }
             };
 
-            base.SizeChanged += (o, e) =>
+            base.Loaded += (o, e) =>
             {
-                if (e.NewSize.Height != e.PreviousSize.Height)
-                {
-                    OnPropertyChanged(Prism.UI.Controls.ActionMenu.InsetsProperty);
-                }
+                IsLoaded = true;
+                OnPropertyChanged(Visual.IsLoadedProperty);
+                Loaded(this, EventArgs.Empty);
+            };
+
+            base.Unloaded += (o, e) =>
+            {
+                IsLoaded = false;
+                OnPropertyChanged(Visual.IsLoadedProperty);
+                Unloaded(this, EventArgs.Empty);
             };
         }
 
         /// <summary>
-        /// Invoked whenever application code or internal processes (such as a rebuilding layout pass) call ApplyTemplate.
-        /// In simplest terms, this means the method is called just before a UI element displays in your app.
-        /// Override this method to influence the default post-template logic of a class.
+        /// Measures the object and returns its desired size.
         /// </summary>
-        protected override void OnApplyTemplate()
+        /// <param name="constraints">The width and height that the object is not allowed to exceed.</param>
+        /// <returns>The desired size as a <see cref="Size"/> instance.</returns>
+        public Size Measure(Size constraints)
         {
-            base.OnApplyTemplate();
-            SetOverflowBackground();
-            SetOverflowImage();
+            base.Measure(constraints.GetSize());
+            return DesiredSize.GetSize();
+        }
+
+        /// <summary>
+        /// Provides the behavior for the Arrange pass of layout. Classes can override this method to define their own Arrange pass behavior.
+        /// </summary>
+        /// <param name="finalSize">The final area within the parent that this object should use to arrange itself and its children.</param>
+        protected override global::Windows.Foundation.Size ArrangeOverride(global::Windows.Foundation.Size finalSize)
+        {
+            ArrangeRequest(false, null);
+            return base.ArrangeOverride(finalSize);
+        }
+
+        /// <summary>
+        /// Provides the behavior for the Measure pass of the layout cycle. Classes can
+        /// override this method to define their own Measure pass behavior.
+        /// </summary>
+        /// <param name="availableSize">The available size that this object can give to child objects. 
+        /// Infinity can be specified as a value to indicate that the object will size to whatever content is available.</param>
+        protected override global::Windows.Foundation.Size MeasureOverride(global::Windows.Foundation.Size availableSize)
+        {
+            MeasureRequest(false, null);
+            return base.MeasureOverride(availableSize);
         }
 
         /// <summary>
@@ -292,50 +437,40 @@ namespace Prism.Windows.UI.Controls
             PropertyChanged(this, new FrameworkPropertyChangedEventArgs(pd));
         }
 
-        private void OrganizeItems()
+        private void SetButtons()
         {
-            if (maxDisplayItems < PrimaryCommands.Count)
+            bool hasOverflow = maxDisplayItems < Items.Count;
+            var items = ((ObservableCollection<INativeMenuItem>)Items).Take(hasOverflow ? maxDisplayItems : Items.Count).OfType<UIElement>();
+            var itemsEnumerator = items.GetEnumerator();
+
+            Children.Clear();
+
+            int count = items.Count() + (hasOverflow ? 1 : 0);
+            for (int i = 0; i < count; i++)
             {
-                for (int i = PrimaryCommands.Count - 1; i >= maxDisplayItems; i--)
+                if (i == count - 1 && hasOverflow)
                 {
-                    var item = PrimaryCommands[i];
-                    PrimaryCommands.RemoveAt(i);
-                    SecondaryCommands.Insert(0, item);
+                    Children.Insert(i, OverflowButton);
                 }
-            }
-            else if (maxDisplayItems > PrimaryCommands.Count && SecondaryCommands.Count > 0)
-            {
-                for (; maxDisplayItems > PrimaryCommands.Count && SecondaryCommands.Count > 0;)
+                else if (itemsEnumerator.MoveNext())
                 {
-                    var item = SecondaryCommands[0];
-                    SecondaryCommands.RemoveAt(0);
-                    PrimaryCommands.Add(item);
+                    Children.Insert(i, itemsEnumerator.Current);
                 }
             }
         }
 
-        private void SetOverflowBackground()
+        private class MenuButtonCommand : ICommand
         {
-            var presenter = (this.GetChild<global::Windows.UI.Xaml.Controls.Primitives.Popup>(e => e.Name == "OverflowPopup")?
-                .Child as global::Windows.UI.Xaml.Controls.Panel)?.GetChild<CommandBarOverflowPresenter>();
+            event EventHandler ICommand.CanExecuteChanged { add { } remove { } }
 
-            if (presenter != null)
+            public bool CanExecute(object parameter)
             {
-                presenter.Background = base.Background;
+                return (parameter as INativeMenuButton)?.IsEnabled ?? true;
             }
-        }
 
-        private void SetOverflowImage()
-        {
-            var button = this.GetChild<ContentControl>(e => e.Name == "MoreButton");
-            if (button != null)
+            public void Execute(object parameter)
             {
-                if (defaultOverflowImage == null)
-                {
-                    defaultOverflowImage = button.Content;
-                }
-                
-                button.Content = overflowImageUri == null ? defaultOverflowImage : new BitmapIcon() { UriSource = overflowImageUri };
+                (parameter as INativeMenuButton).Action();
             }
         }
     }
