@@ -280,6 +280,12 @@ namespace Prism.Windows.UI
                     OnPropertyChanged(Visual.IsLoadedProperty);
                     Unloaded(this, EventArgs.Empty);
                 }
+
+                var element = menu as UIElement;
+                if (element != null)
+                {
+                    element.GetParent<Panel>()?.Children.Remove(element);
+                }
             };
 
             contentCanvas = new Canvas()
@@ -339,6 +345,7 @@ namespace Prism.Windows.UI
             var element = menu as UIElement;
             if (element != null)
             {
+                element.GetParent<Panel>()?.Children.Remove(element);
                 (this.GetParent<INativeViewStack>()?.Header as Panel)?.Children.Add(element);
 
                 var fwElement = element as FrameworkElement;
