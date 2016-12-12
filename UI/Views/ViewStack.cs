@@ -362,7 +362,7 @@ namespace Prism.Windows.UI
             }
 
             var popped = views.Skip(1);
-            views.RemoveRange(1, views.Count - 2);
+            views.RemoveRange(1, views.Count - 1);
 
             ViewChanging(this, new NativeViewStackViewChangingEventArgs(contentControl.Content, views.Last()));
             contentControl.Content = views.Last();
