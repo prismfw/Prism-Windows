@@ -47,6 +47,16 @@ namespace Prism.Windows
         /// <param name="brush">The brush.</param>
         public static global::Windows.UI.Xaml.Media.Brush GetBrush(this Prism.UI.Media.Brush brush)
         {
+            var dataBrush = brush as Prism.UI.Media.DataBrush;
+            if (dataBrush != null)
+            {
+                if (dataBrush.Data is global::Windows.UI.Color)
+                {
+                    return new global::Windows.UI.Xaml.Media.SolidColorBrush((global::Windows.UI.Color)dataBrush.Data);
+                }
+                return dataBrush.Data as global::Windows.UI.Xaml.Media.Brush;
+            }
+
             var solidColor = brush as Prism.UI.Media.SolidColorBrush;
             if (solidColor != null)
             {

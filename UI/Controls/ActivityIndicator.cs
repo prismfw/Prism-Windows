@@ -123,7 +123,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != foreground)
                 {
                     foreground = value;
-                    Element.Foreground = foreground.GetBrush() ?? ThemeResources.AccentColorBrush;
+                    Element.Foreground = foreground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.HighlightAccentBrushId);
                     OnPropertyChanged(Prism.UI.Controls.ActivityIndicator.ForegroundProperty);
                 }
             }
@@ -252,7 +252,6 @@ namespace Prism.Windows.UI.Controls
             RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
             Content = Element = new ProgressRing()
             {
-                Foreground = ThemeResources.AccentColorBrush,
                 IsActive = false
             };
 

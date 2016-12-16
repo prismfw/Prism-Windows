@@ -137,7 +137,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != background)
                 {
                     background = value;
-                    base.Background = background.GetBrush() ?? ThemeResources.AltMediumBrush;
+                    base.Background = background.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.BackgroundAltMediumLowBrushId);
                     OnPropertyChanged(Prism.UI.Controls.Control.BackgroundProperty);
                 }
             }
@@ -155,7 +155,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != borderBrush)
                 {
                     borderBrush = value;
-                    base.BorderBrush = borderBrush.GetBrush() ?? ThemeResources.BaseMediumLowBrush;
+                    base.BorderBrush = borderBrush.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseMediumLowBrushId);
                     OnPropertyChanged(Prism.UI.Controls.Control.BorderBrushProperty);
                 }
             }
@@ -287,13 +287,17 @@ namespace Prism.Windows.UI.Controls
                     }
 
                     foreground = value;
-                    var brush = foreground.GetBrush();
-                    base.Foreground = brush ?? ThemeResources.ButtonForegroundBrush;
 
-                    var glyph = this.GetChild<FontIcon>(c => c.Name == "DropDownGlyph");
-                    if (glyph != null)
+                    var brush = foreground.GetBrush();
+                    base.Foreground = brush ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseHighBrushId);
+
+                    if (glyphForeground == null)
                     {
-                        glyph.Foreground = brush ?? ThemeResources.BaseMediumHighBrush;
+                        var glyph = this.GetChild<FontIcon>(c => c.Name == "DropDownGlyph");
+                        if (glyph != null)
+                        {
+                            glyph.Foreground = brush ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseMediumHighBrushId);
+                        }
                     }
 
                     OnPropertyChanged(Prism.UI.Controls.Control.ForegroundProperty);
@@ -319,6 +323,26 @@ namespace Prism.Windows.UI.Controls
             }
         }
         private Rectangle frame = new Rectangle();
+
+        /// <summary>
+        /// Gets or sets the <see cref="Brush"/> to apply to the drop down glyph.
+        /// </summary>
+        public Brush GlyphForeground
+        {
+            get { return glyphForeground; }
+            set
+            {
+                glyphForeground = value;
+
+                var glyph = this.GetChild<FontIcon>(c => c.Name == "DropDownGlyph");
+                if (glyph != null)
+                {
+                    glyph.Foreground = (glyphForeground ?? foreground).GetBrush() ??
+                        Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseMediumHighBrushId);
+                }
+            }
+        }
+        private Brush glyphForeground;
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance can be considered a valid result for hit testing.
@@ -597,6 +621,23 @@ namespace Prism.Windows.UI.Controls
             var desiredSize = MeasureRequest(false, null).GetSize();
             base.MeasureOverride(desiredSize);
             return desiredSize;
+        }
+
+        /// <summary>
+        /// Invoked whenever application code or internal processes (such as a rebuilding layout pass) call ApplyTemplate.
+        /// In simplest terms, this means the method is called just before a UI element displays in your app.
+        /// Override this method to influence the default post-template logic of a class.
+        /// </summary>
+        protected override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+            var glyph = this.GetChild<FontIcon>(c => c.Name == "DropDownGlyph");
+            if (glyph != null)
+            {
+                glyph.Foreground = (glyphForeground ?? foreground).GetBrush() ??
+                    Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseMediumHighBrushId);
+            }
         }
 
         /// <summary>

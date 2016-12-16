@@ -142,7 +142,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != background)
                 {
                     background = value;
-                    base.Background = background.GetBrush() ?? ThemeResources.BaseLowBrush;
+                    base.Background = background.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.BackgroundBaseLowBrushId);
                     OnPropertyChanged(Prism.UI.Controls.Control.BackgroundProperty);
                 }
             }
@@ -160,7 +160,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != borderBrush)
                 {
                     borderBrush = value;
-                    base.BorderBrush = borderBrush.GetBrush();
+                    base.BorderBrush = borderBrush.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundTransparentBrushId);
                     OnPropertyChanged(Prism.UI.Controls.Control.BorderBrushProperty);
                 }
             }
@@ -289,7 +289,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != foreground)
                 {
                     foreground = value;
-                    textBlock.Foreground = foreground.GetBrush() ?? ThemeResources.ButtonForegroundBrush;
+                    textBlock.Foreground = foreground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseHighBrushId);
                     OnPropertyChanged(Prism.UI.Controls.Control.ForegroundProperty);
                 }
             }
@@ -461,7 +461,6 @@ namespace Prism.Windows.UI.Controls
                 }
             }
         }
-
         private Visibility visibility;
 
         private readonly StackPanel contentPanel;

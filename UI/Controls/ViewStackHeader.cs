@@ -168,7 +168,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != foreground)
                 {
                     foreground = value;
-                    headerLabel.Foreground = value.GetBrush() ?? ThemeResources.TextForegroundBrush;
+                    headerLabel.Foreground = value.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.PageTextBaseHighBrushId);
                     OnPropertyChanged(Prism.UI.Controls.ViewStackHeader.ForegroundProperty);
                 }
             }
@@ -277,13 +277,12 @@ namespace Prism.Windows.UI.Controls
         {
             headerLabel = new TextBlock()
             {
-                Foreground = ThemeResources.TextForegroundBrush,
                 HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Center,
                 VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Center
             };
             Children.Add(headerLabel);
 
-            BorderBrush = new global::Windows.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Color.FromArgb(64, 120, 120, 120));
+            BorderBrush = Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseLowBrushId);
             BorderThickness = new global::Windows.UI.Xaml.Thickness(0, 0, 0, 1);
             Height = 64;
             HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Stretch;

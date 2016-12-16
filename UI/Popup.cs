@@ -222,7 +222,7 @@ namespace Prism.Windows.UI
         /// </summary>
         public Popup()
         {
-            Background = ThemeResources.BackgroundBrush;
+            Background = Windows.Resources.GetBrush(this, Windows.Resources.PageBackgroundChromeLowBrushId);
             RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
 
             Element = new global::Windows.UI.Xaml.Controls.Primitives.Popup() { Child = this };

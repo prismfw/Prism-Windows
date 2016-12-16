@@ -136,7 +136,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != background)
                 {
                     background = value;
-                    base.Background = background.GetBrush() ?? ThemeResources.BaseLowBrush;
+                    base.Background = background.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.BackgroundBaseLowBrushId);
                     OnPropertyChanged(Prism.UI.Controls.Control.BackgroundProperty);
                 }
             }
@@ -154,7 +154,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != borderBrush)
                 {
                     borderBrush = value;
-                    base.BorderBrush = borderBrush.GetBrush();
+                    base.BorderBrush = borderBrush.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundTransparentBrushId);
                     OnPropertyChanged(Prism.UI.Controls.Control.BorderBrushProperty);
                 }
             }
@@ -261,7 +261,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != foreground)
                 {
                     foreground = value;
-                    base.Foreground = foreground.GetBrush() ?? ThemeResources.ButtonForegroundBrush;
+                    base.Foreground = foreground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseHighBrushId);
                     OnPropertyChanged(Prism.UI.Controls.Control.ForegroundProperty);
                 }
             }

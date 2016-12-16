@@ -277,7 +277,7 @@ namespace Prism.Windows.UI.Controls
                     
                     if (IsSelected)
                     {
-                        base.Background = selectedBackground.GetBrush() ?? selectedBackgroundDefault;
+                        base.Background = selectedBackground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.HighlightListAccentLowBrushId);
                     }
 
                     OnPropertyChanged(Prism.UI.Controls.ListBoxItem.SelectedBackgroundProperty);
@@ -328,7 +328,6 @@ namespace Prism.Windows.UI.Controls
         private readonly Line separator;
         private bool isInitialized;
         private double? parentWidth;
-        private global::Windows.UI.Xaml.Media.Brush selectedBackgroundDefault;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ListBoxItem"/> class.
@@ -350,7 +349,6 @@ namespace Prism.Windows.UI.Controls
                 var presenter = this.GetParent<ListViewItemPresenter>();
                 if (presenter != null)
                 {
-                    selectedBackgroundDefault = presenter.SelectedBackground;
                     presenter.SelectedBackground = presenter.SelectedPointerOverBackground = null;
                 }
 
@@ -475,7 +473,7 @@ namespace Prism.Windows.UI.Controls
             var item = sender as ListBoxItem;
             if (item != null && e.Property == IsSelectedProperty)
             {
-                item.SetValue(BackgroundProperty, item.IsSelected ? (item.selectedBackground.GetBrush() ?? item.selectedBackgroundDefault) : item.background.GetBrush());
+                item.SetValue(BackgroundProperty, item.IsSelected ? (item.selectedBackground.GetBrush() ?? Windows.Resources.GetBrush(item, Windows.Resources.HighlightListAccentLowBrushId)) : item.background.GetBrush());
                 item.OnPropertyChanged(Prism.UI.Controls.ListBoxItem.IsSelectedProperty);
             }
         }

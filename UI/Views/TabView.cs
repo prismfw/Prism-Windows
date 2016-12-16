@@ -140,7 +140,7 @@ namespace Prism.Windows.UI
                     foreground = value;
                     foreach (var presenter in ListView.Items.Select(i => (i as DependencyObject).GetParent<ListViewItemPresenter>()).Where(p => p != null))
                     {
-                        presenter.SelectedBackground = presenter.SelectedPointerOverBackground = foreground.GetBrush() ?? Controls.TabItem.SelectedBackgroundDefault;
+                        presenter.SelectedBackground = presenter.SelectedPointerOverBackground = foreground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.HighlightListAccentLowBrushId);
                     }
 
                     OnPropertyChanged(Prism.UI.TabView.ForegroundProperty);

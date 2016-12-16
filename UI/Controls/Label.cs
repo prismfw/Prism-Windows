@@ -178,7 +178,7 @@ namespace Prism.Windows.UI.Controls
                     var lvi = this.GetParent<ListViewItem>();
                     if (lvi == null || !lvi.IsSelected || highlightBrush == null)
                     {
-                        Element.Foreground = foreground.GetBrush() ?? ThemeResources.TextForegroundBrush;
+                        Element.Foreground = foreground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.PageTextBaseHighBrushId);
                     }
 
                     OnPropertyChanged(Prism.UI.Controls.Label.ForegroundProperty);
@@ -220,7 +220,7 @@ namespace Prism.Windows.UI.Controls
                     var lvi = this.GetParent<ListViewItem>();
                     if (lvi != null && lvi.IsSelected)
                     {
-                        Element.Foreground = highlightBrush.GetBrush() ?? foreground.GetBrush() ?? ThemeResources.TextForegroundBrush;
+                        Element.Foreground = highlightBrush.GetBrush() ?? foreground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.PageTextBaseHighBrushId);
                     }
 
                     OnPropertyChanged(Prism.UI.Controls.Label.HighlightBrushProperty);
@@ -386,7 +386,6 @@ namespace Prism.Windows.UI.Controls
             RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
             Content = Element = new TextBlock()
             {
-                Foreground = ThemeResources.TextForegroundBrush,
                 TextWrapping = TextWrapping.Wrap,
                 TextTrimming = TextTrimming.CharacterEllipsis
             };
@@ -512,7 +511,7 @@ namespace Prism.Windows.UI.Controls
             }
             else
             {
-                Element.Foreground = foreground.GetBrush() ?? ThemeResources.TextForegroundBrush;
+                Element.Foreground = foreground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.PageTextBaseHighBrushId);
             }
         }
     }

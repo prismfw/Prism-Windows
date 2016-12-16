@@ -106,7 +106,7 @@ namespace Prism.Windows.UI.Controls
                     OverflowMenu.MenuFlyoutPresenterStyle = new Style()
                     {
                         TargetType = typeof(MenuFlyoutPresenter),
-                        Setters = { new Setter(Control.BackgroundProperty, background.GetBrush()) }
+                        Setters = { new Setter(Control.BackgroundProperty, background.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.BackgroundChromeMediumLowBrushId)) }
                     };
 
                     OnPropertyChanged(Prism.UI.Controls.ActionMenu.BackgroundProperty);
@@ -144,7 +144,7 @@ namespace Prism.Windows.UI.Controls
                 {
                     foreground = value;
 
-                    var brush = foreground.GetBrush() ?? ThemeResources.ButtonForegroundBrush;
+                    var brush = foreground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseHighBrushId);
                     OverflowButton.Foreground = brush;
                     foreach (var item in Items.OfType<INativeMenuItem>().Where(i => i.Foreground == null))
                     {
@@ -306,7 +306,7 @@ namespace Prism.Windows.UI.Controls
                         {
                             Command = new MenuButtonCommand(),
                             CommandParameter = item,
-                            Foreground = menuButton.Foreground.GetBrush() ?? foreground.GetBrush() ?? ThemeResources.ButtonForegroundBrush,
+                            Foreground = menuButton.Foreground.GetBrush() ?? foreground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseHighBrushId),
                             IsEnabled = menuButton.IsEnabled,
                             IsHitTestVisible = base.IsHitTestVisible,
                             Text = menuButton.Title
@@ -316,7 +316,7 @@ namespace Prism.Windows.UI.Controls
                     {
                         OverflowMenu.Items.Add(new MenuFlyoutSeparator()
                         {
-                            Background = item.Foreground.GetBrush() ?? foreground.GetBrush() ?? ThemeResources.ButtonForegroundBrush,
+                            Background = item.Foreground.GetBrush() ?? foreground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseHighBrushId),
                         });
                     }
                 }

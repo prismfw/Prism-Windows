@@ -53,7 +53,9 @@ namespace Prism.Windows.UI.Controls
                 if (value != foreground)
                 {
                     foreground = value;
-                    base.Foreground = foreground.GetBrush() ?? this.GetParent<AppBar>()?.Foreground ?? ThemeResources.ButtonForegroundBrush;
+                    base.Foreground = foreground.GetBrush() ?? this.GetParent<ActionMenu>()?.Foreground.GetBrush() ??
+                        Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseHighBrushId);
+
                     OnPropertyChanged(Prism.UI.Controls.MenuItem.ForegroundProperty);
                 }
             }
@@ -119,6 +121,7 @@ namespace Prism.Windows.UI.Controls
         public MenuButton()
         {
             Background = new global::Windows.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Colors.Transparent);
+            base.Foreground = Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseHighBrushId);
             Padding = new global::Windows.UI.Xaml.Thickness(8);
             RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
 

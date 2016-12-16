@@ -102,7 +102,7 @@ namespace Prism.Windows.UI
                 if (value != background)
                 {
                     background = value;
-                    base.Background = value.GetBrush() ?? ThemeResources.BackgroundBrush;
+                    base.Background = value.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.PageBackgroundChromeLowBrushId);
                     OnPropertyChanged(Prism.UI.ContentView.BackgroundProperty);
                 }
             }
@@ -255,7 +255,6 @@ namespace Prism.Windows.UI
         /// </summary>
         public ContentView()
         {
-            base.Background = ThemeResources.BackgroundBrush;
             RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
             HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Stretch;
             VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Stretch;

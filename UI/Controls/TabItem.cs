@@ -185,7 +185,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != foreground)
                 {
                     foreground = value;
-                    TextBlock.Foreground = foreground.GetBrush();
+                    TextBlock.Foreground = foreground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.PageTextBaseHighBrushId);
                     OnPropertyChanged(Prism.UI.Controls.TabItem.ForegroundProperty);
                 }
             }
@@ -312,9 +312,6 @@ namespace Prism.Windows.UI.Controls
         /// </summary>
         protected TextBlock TextBlock { get; }
 
-        internal static global::Windows.UI.Xaml.Media.Brush SelectedBackgroundDefault { get; set; } =
-            new global::Windows.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Color.FromArgb(102, 0, 120, 215));
-
         /// <summary>
         /// Initializes a new instance of the <see cref="TabItem"/> class.
         /// </summary>
@@ -347,7 +344,7 @@ namespace Prism.Windows.UI.Controls
                 {
                     presenter.IsHitTestVisible = base.IsHitTestVisible;
                     presenter.SelectedBackground = presenter.SelectedPointerOverBackground =
-                        presenter.GetParent<INativeTabView>()?.Foreground.GetBrush() ?? SelectedBackgroundDefault;
+                        presenter.GetParent<INativeTabView>()?.Foreground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.HighlightListAccentLowBrushId);
                 }
 
                 if (!IsLoaded)

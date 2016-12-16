@@ -159,7 +159,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != background)
                 {
                     background = value;
-                    Element.Background = background.GetBrush() ?? ThemeResources.AltMediumBrush;
+                    Element.Background = background.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.BackgroundAltHighBrushId);
                     OnPropertyChanged(Prism.UI.Controls.Control.BackgroundProperty);
                 }
             }
@@ -177,7 +177,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != borderBrush)
                 {
                     borderBrush = value;
-                    Element.BorderBrush = borderBrush.GetBrush() ?? ThemeResources.BaseMediumBrush;
+                    Element.BorderBrush = borderBrush.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundChromeDisabledLowBrushId);
                     OnPropertyChanged(Prism.UI.Controls.Control.BorderBrushProperty);
                 }
             }
@@ -265,7 +265,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != foreground)
                 {
                     foreground = value;
-                    Element.Foreground = foreground.GetBrush() ?? ThemeResources.TextForegroundBrush;
+                    Element.Foreground = foreground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseHighBrushId);
                     OnPropertyChanged(Prism.UI.Controls.Control.ForegroundProperty);
                 }
             }

@@ -138,7 +138,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != background)
                 {
                     background = value;
-                    Element.Background = background.GetBrush() ?? ThemeResources.AltHighBrush;
+                    Element.Background = background.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.BackgroundAltHighBrushId);
                     OnPropertyChanged(Prism.UI.Controls.Control.BackgroundProperty);
                 }
             }
@@ -156,7 +156,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != borderBrush)
                 {
                     borderBrush = value;
-                    Element.BorderBrush = borderBrush.GetBrush() ?? ThemeResources.BaseHighBrush;
+                    Element.BorderBrush = borderBrush.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseHighBrushId);
                     OnPropertyChanged(Prism.UI.Controls.Control.BorderBrushProperty);
                 }
             }
@@ -244,7 +244,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != foreground)
                 {
                     foreground = value;
-                    Element.Foreground = foreground.GetBrush() ?? ThemeResources.AccentColorBrush;
+                    Element.Foreground = foreground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.HighlightAccentBrushId);
                     OnPropertyChanged(Prism.UI.Controls.Control.ForegroundProperty);
                 }
             }
@@ -361,7 +361,7 @@ namespace Prism.Windows.UI.Controls
                     var thumb = Element.GetChild<Ellipse>(c => c.Name == "SwitchKnobOff");
                     if (thumb != null)
                     {
-                        thumb.Fill = thumbOffBrush.GetBrush() ?? ThemeResources.BaseMediumHighBrush;
+                        thumb.Fill = thumbOffBrush.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseMediumHighBrushId);
                     }
 
                     OnPropertyChanged(Prism.UI.Controls.ToggleSwitch.ThumbOffBrushProperty);
@@ -385,7 +385,7 @@ namespace Prism.Windows.UI.Controls
                     var thumb = Element.GetChild<Ellipse>(c => c.Name == "SwitchKnobOn");
                     if (thumb != null)
                     {
-                        thumb.Fill = thumbOnBrush.GetBrush() ?? ThemeResources.ChromeWhiteBrush;
+                        thumb.Fill = thumbOnBrush.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.HighlightAltChromeWhiteBrushId);
                     }
 
                     OnPropertyChanged(Prism.UI.Controls.ToggleSwitch.ThumbOnBrushProperty);
@@ -440,8 +440,6 @@ namespace Prism.Windows.UI.Controls
 
             Content = Element = new global::Windows.UI.Xaml.Controls.ToggleSwitch()
             {
-                BorderBrush = ThemeResources.BaseHighBrush,
-                Foreground = ThemeResources.AccentColorBrush,
                 Margin = new global::Windows.UI.Xaml.Thickness(),
                 OffContent = null,
                 OnContent = null,
@@ -664,13 +662,13 @@ namespace Prism.Windows.UI.Controls
             var thumb = Element.GetChild<Ellipse>(c => c.Name == "SwitchKnobOn");
             if (thumb != null)
             {
-                thumb.Fill = thumbOnBrush.GetBrush() ?? ThemeResources.ChromeWhiteBrush;
+                thumb.Fill = thumbOnBrush.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.HighlightAltChromeWhiteBrushId);
             }
 
             thumb = Element.GetChild<Ellipse>(c => c.Name == "SwitchKnobOff");
             if (thumb != null)
             {
-                thumb.Fill = thumbOffBrush.GetBrush() ?? ThemeResources.BaseMediumHighBrush;
+                thumb.Fill = thumbOffBrush.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseMediumHighBrushId);
             }
 
             var visualStates = global::Windows.UI.Xaml.VisualStateManager.GetVisualStateGroups(grid).FirstOrDefault(vg => vg.Name == "CommonStates");

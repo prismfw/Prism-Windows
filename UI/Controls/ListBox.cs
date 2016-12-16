@@ -390,7 +390,7 @@ namespace Prism.Windows.UI.Controls
                             var separator = (Shape)item.GetChild<Line>(c => c.Name == "separator") ?? item.GetChild<global::Windows.UI.Xaml.Shapes.Rectangle>();
                             if (separator != null)
                             {
-                                separator.Stroke = separatorBrush.GetBrush() ?? new global::Windows.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Color.FromArgb(50, 0, 0, 0));
+                                separator.Stroke = separatorBrush.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseLowBrushId);
                             }
                         }
                     }
@@ -497,7 +497,7 @@ namespace Prism.Windows.UI.Controls
                 var separator = e.GroupHeaderContainer?.GetChild<global::Windows.UI.Xaml.Shapes.Rectangle>();
                 if (separator != null)
                 {
-                    separator.Stroke = separatorBrush.GetBrush() ?? new global::Windows.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Color.FromArgb(50, 0, 0, 0));
+                    separator.Stroke = separatorBrush.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseLowBrushId);
                 }
             };
 
@@ -852,7 +852,7 @@ namespace Prism.Windows.UI.Controls
                     var separator = (item as DependencyObject)?.GetChild<Line>(c => c.Name == "separator");
                     if (separator != null)
                     {
-                        separator.Stroke = listBox.separatorBrush.GetBrush() ?? new global::Windows.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Color.FromArgb(50, 0, 0, 0));
+                        separator.Stroke = listBox.separatorBrush.GetBrush() ?? Windows.Resources.GetBrush(listBox, Windows.Resources.ForegroundBaseLowBrushId);
                     }
                 }
 

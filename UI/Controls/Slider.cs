@@ -130,7 +130,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != background)
                 {
                     background = value;
-                    base.Background = background.GetBrush() ?? ThemeResources.BaseMediumLowBrush;
+                    base.Background = background.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseMediumLowBrushId);
                     OnPropertyChanged(Prism.UI.Controls.Control.BackgroundProperty);
                 }
             }
@@ -236,7 +236,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != foreground)
                 {
                     foreground = value;
-                    base.Foreground = foreground.GetBrush() ?? ThemeResources.AccentColorBrush;
+                    base.Foreground = foreground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.HighlightAccentBrushId);
                     OnPropertyChanged(Prism.UI.Controls.Control.ForegroundProperty);
                 }
             }
@@ -417,7 +417,7 @@ namespace Prism.Windows.UI.Controls
                     var thumb = GetTemplateChild("HorizontalThumb") as Thumb;
                     if (thumb != null)
                     {
-                        thumb.Background = thumbBrush.GetBrush() ?? ThemeResources.BaseHighBrush;
+                        thumb.Background = thumbBrush.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundAccentBrushId);
                         thumb.BorderBrush = thumb.Background;
                     }
 
@@ -453,8 +453,6 @@ namespace Prism.Windows.UI.Controls
         /// </summary>
         public Slider()
         {
-            base.Background = ThemeResources.BaseMediumLowBrush;
-            base.Foreground = ThemeResources.AccentColorBrush;
             Margin = new global::Windows.UI.Xaml.Thickness();
             Padding = new global::Windows.UI.Xaml.Thickness();
             RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
@@ -567,7 +565,7 @@ namespace Prism.Windows.UI.Controls
             var thumb = GetTemplateChild("HorizontalThumb") as Thumb;
             if (thumb != null)
             {
-                thumb.Background = thumbBrush.GetBrush() ?? ThemeResources.BaseHighBrush;
+                thumb.Background = thumbBrush.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundAccentBrushId);
                 thumb.BorderBrush = thumb.Background;
                 thumb.Margin = new global::Windows.UI.Xaml.Thickness();
                 thumb.VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Center;
