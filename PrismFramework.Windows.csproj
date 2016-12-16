@@ -128,7 +128,6 @@
     <Compile Include="Extensions\WindowsExtensions.cs" />
     <Compile Include="Resources.cs" />
     <Compile Include="Systems\Geolocation\Geolocator.cs" />
-    <Compile Include="ThemeResources.cs" />
     <Compile Include="UI\Controls\ActionMenu.cs" />
     <Compile Include="UI\Controls\ActivityIndicator.cs" />
     <Compile Include="UI\Controls\MenuSeparator.cs" />
