@@ -270,17 +270,11 @@ namespace Prism.Windows
                 {
                     value = ((Color)value).GetColor();
                 }
-                else
+                else if (value is Brush)
                 {
-                    var scb = value as global::Windows.UI.Xaml.Media.SolidColorBrush;
-                    if (scb != null)
-                    {
-                        value = new SolidColorBrush(scb.Color.GetColor());
-                    }
-                    else if (value is Brush)
-                    {
-                        value = new DataBrush(value);
-                    }
+                    // We would like to convert SolidColorBrushes, but we can't do that without losing the
+                    // internal bindings those brushes have that are triggered upon changes to system settings.
+                    value = new DataBrush(value);
                 }
             }
 
