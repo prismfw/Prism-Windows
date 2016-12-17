@@ -133,12 +133,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != background)
                 {
                     background = value;
-
-                    if (!IsSelected)
-                    {
-                        base.Background = background.GetBrush();
-                    }
-
+                    SetBackground();
                     OnPropertyChanged(Prism.UI.Controls.ListBoxItem.BackgroundProperty);
                 }
             }
@@ -274,12 +269,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != selectedBackground)
                 {
                     selectedBackground = value;
-                    
-                    if (IsSelected)
-                    {
-                        base.Background = selectedBackground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.HighlightListAccentLowBrushId);
-                    }
-
+                    SetBackground();
                     OnPropertyChanged(Prism.UI.Controls.ListBoxItem.SelectedBackgroundProperty);
                 }
             }
@@ -355,6 +345,7 @@ namespace Prism.Windows.UI.Controls
                 var lvi = this.GetParent<ListViewItem>();
                 if (lvi != null)
                 {
+                    SetBackground();
                     SetBinding(IsSelectedProperty, new Binding()
                     {
                         Source = lvi,
@@ -473,7 +464,7 @@ namespace Prism.Windows.UI.Controls
             var item = sender as ListBoxItem;
             if (item != null && e.Property == IsSelectedProperty)
             {
-                item.SetValue(BackgroundProperty, item.IsSelected ? (item.selectedBackground.GetBrush() ?? Windows.Resources.GetBrush(item, Windows.Resources.HighlightListAccentLowBrushId)) : item.background.GetBrush());
+                item.SetBackground();
                 item.OnPropertyChanged(Prism.UI.Controls.ListBoxItem.IsSelectedProperty);
             }
         }
@@ -494,6 +485,15 @@ namespace Prism.Windows.UI.Controls
             isInitialized = true;
 
             presenter.ContentMargin = new global::Windows.UI.Xaml.Thickness();
+        }
+
+        private void SetBackground()
+        {
+            var lvi = this.GetParent<ListViewItem>();
+            if (lvi != null)
+            {
+                lvi.Background = IsSelected ? (selectedBackground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.HighlightListAccentLowBrushId)) : background.GetBrush();
+            }
         }
 
         private void SetSeparatorPosition()
