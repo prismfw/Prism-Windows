@@ -197,6 +197,7 @@ namespace Prism.Windows
                     case SystemResourceKeyId.DateTimePickerBorderBrush:
                         id = ForegroundTransparentBrushId;
                         break;
+                    case SystemResourceKeyId.GroupedListBoxItemBackgroundBrush:
                     case SystemResourceKeyId.GroupedSectionHeaderBackgroundBrush:
                     case SystemResourceKeyId.ListBoxBackgroundBrush:
                     case SystemResourceKeyId.ListBoxItemBackgroundBrush:
