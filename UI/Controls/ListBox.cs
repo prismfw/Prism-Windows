@@ -362,8 +362,31 @@ namespace Prism.Windows.UI.Controls
             {
                 if (value != SelectionMode)
                 {
+                    isChangingMode = true;
+                    var oldSelectedItems = base.SelectedItems.ToArray();
+
                     base.SelectionMode = (ListViewSelectionMode)value;
                     OnPropertyChanged(Prism.UI.Controls.ListBox.SelectionModeProperty);
+
+                    if (base.SelectionMode == ListViewSelectionMode.None || base.SelectionMode == ListViewSelectionMode.Single)
+                    {
+                        base.SelectedItem = null;
+                        if (oldSelectedItems.Length > 0)
+                        {
+                            OnPropertyChanged(Prism.UI.Controls.ListBox.SelectedItemsProperty);
+                            SelectionChanged(this, new Prism.UI.Controls.SelectionChangedEventArgs(new object[0], oldSelectedItems));
+                        }
+                    }
+                    else if (base.SelectedItems.Count != oldSelectedItems.Length)
+                    {
+                        base.SelectedItems.Clear();
+                        foreach (var item in oldSelectedItems)
+                        {
+                            base.SelectedItems.Add(item);
+                        }
+                    }
+
+                    isChangingMode = false;
                 }
             }
         }
@@ -434,6 +457,7 @@ namespace Prism.Windows.UI.Controls
 
         private readonly CollectionViewSource collectionSource;
         private readonly Dictionary<INativeListBoxItem, object> itemMap = new Dictionary<INativeListBoxItem, object>();
+        private bool isChangingMode;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ListBox"/> class.
@@ -549,7 +573,7 @@ namespace Prism.Windows.UI.Controls
 
             base.SelectionChanged += (o, e) =>
             {
-                if (IsLoaded)
+                if (IsLoaded && !isChangingMode)
                 {
                     OnPropertyChanged(Prism.UI.Controls.ListBox.SelectedItemsProperty);
                     SelectionChanged(this, new Prism.UI.Controls.SelectionChangedEventArgs(e.AddedItems.ToArray(), e.RemovedItems.ToArray()));
