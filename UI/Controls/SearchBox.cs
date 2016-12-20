@@ -143,7 +143,7 @@ namespace Prism.Windows.UI.Controls
         /// <summary>
         /// Gets or sets the background for the control.
         /// </summary>
-        public new Brush Background
+        Brush INativeControl.Background
         {
             get { return background; }
             set
@@ -161,7 +161,7 @@ namespace Prism.Windows.UI.Controls
         /// <summary>
         /// Gets or sets the <see cref="Brush"/> to apply to the border of the control.
         /// </summary>
-        public new Brush BorderBrush
+        Brush INativeControl.BorderBrush
         {
             get { return borderBrush; }
             set
@@ -249,7 +249,7 @@ namespace Prism.Windows.UI.Controls
         /// <summary>
         /// Gets or sets the <see cref="Brush"/> to apply to the foreground content of the control.
         /// </summary>
-        public new Brush Foreground
+        Brush INativeControl.Foreground
         {
             get { return foreground; }
             set

@@ -25,7 +25,6 @@ using Prism.Native;
 using Prism.UI;
 using Prism.UI.Media;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media.Animation;
 
 namespace Prism.Windows.UI.Controls
@@ -207,6 +206,7 @@ namespace Prism.Windows.UI.Controls
                 if (fontFamily != base.FontFamily)
                 {
                     this.SetFont(fontFamily, FontStyle);
+                    this.GetChild<ContentControl>(c => c.Name == "PlaceholderTextContentPresenter")?.SetFont(fontFamily, FontStyle);
                     OnPropertyChanged(Prism.UI.Controls.Control.FontFamilyProperty);
                 }
             }
@@ -223,6 +223,13 @@ namespace Prism.Windows.UI.Controls
                 if (value != base.FontSize)
                 {
                     base.FontSize = value;
+
+                    var placeholder = this.GetChild<ContentControl>(c => c.Name == "PlaceholderTextContentPresenter");
+                    if (placeholder != null)
+                    {
+                        placeholder.FontSize = value;
+                    }
+
                     OnPropertyChanged(Prism.UI.Controls.Control.FontSizeProperty);
                 }
             }
@@ -239,6 +246,7 @@ namespace Prism.Windows.UI.Controls
                 var style = base.FontStyle;
                 var weight = base.FontWeight.Weight;
                 this.SetFont(base.FontFamily as Media.FontFamily, value);
+                this.GetChild<ContentControl>(c => c.Name == "PlaceholderTextContentPresenter")?.SetFont(base.FontFamily as Media.FontFamily, value);
 
                 if (base.FontStyle != style || base.FontWeight.Weight != weight)
                 {
@@ -628,10 +636,8 @@ namespace Prism.Windows.UI.Controls
             var cc = this.GetChild<ContentControl>(c => c.Name == "PlaceholderTextContentPresenter");
             if (cc != null)
             {
-                cc.SetBinding(FontFamilyProperty, new Binding() { Source = this, Path = new global::Windows.UI.Xaml.PropertyPath("FontFamily") });
-                cc.SetBinding(FontSizeProperty, new Binding() { Source = this, Path = new global::Windows.UI.Xaml.PropertyPath("FontSize") });
-                cc.SetBinding(FontStyleProperty, new Binding() { Source = this, Path = new global::Windows.UI.Xaml.PropertyPath("FontStyle") });
-                cc.SetBinding(FontWeightProperty, new Binding() { Source = this, Path = new global::Windows.UI.Xaml.PropertyPath("FontWeight") });
+                cc.SetFont(base.FontFamily as Media.FontFamily, FontStyle);
+                cc.FontSize = FontSize;
             }
         }
 
