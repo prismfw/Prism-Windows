@@ -20,9 +20,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 using System;
+using System.Linq;
 using Prism.Native;
 using Prism.UI;
 using Prism.UI.Media;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
 
@@ -114,7 +116,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != fontFamily)
                 {
                     fontFamily = value;
-                    headerLabel.SetFont(value as Media.FontFamily, fontStyle);
+                    HeaderLabel.SetFont(value as Media.FontFamily, fontStyle);
                     OnPropertyChanged(Prism.UI.Controls.ViewStackHeader.FontFamilyProperty);
                 }
             }
@@ -132,7 +134,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != fontSize)
                 {
                     fontSize = value;
-                    headerLabel.FontSize = value;
+                    HeaderLabel.FontSize = value;
                     OnPropertyChanged(Prism.UI.Controls.ViewStackHeader.FontSizeProperty);
                 }
             }
@@ -150,7 +152,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != fontStyle)
                 {
                     fontStyle = value;
-                    headerLabel.SetFont(fontFamily as Media.FontFamily, value);
+                    HeaderLabel.SetFont(fontFamily as Media.FontFamily, value);
                     OnPropertyChanged(Prism.UI.Controls.ViewStackHeader.FontStyleProperty);
                 }
             }
@@ -168,7 +170,8 @@ namespace Prism.Windows.UI.Controls
                 if (value != foreground)
                 {
                     foreground = value;
-                    headerLabel.Foreground = value.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.PageTextBaseHighBrushId);
+                    BackButton.Foreground = value.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.PageTextBaseHighBrushId);
+                    HeaderLabel.Foreground = BackButton.Foreground;
                     OnPropertyChanged(Prism.UI.Controls.ViewStackHeader.ForegroundProperty);
                 }
             }
@@ -259,28 +262,52 @@ namespace Prism.Windows.UI.Controls
         /// </summary>
         public string Title
         {
-            get { return headerLabel.Text; }
+            get { return HeaderLabel.Text; }
             set
             {
                 value = value ?? string.Empty;
-                if (value != headerLabel.Text)
+                if (value != HeaderLabel.Text)
                 {
-                    headerLabel.Text = value;
+                    HeaderLabel.Text = value;
                     OnPropertyChanged(Prism.UI.Controls.ViewStackHeader.TitleProperty);
                 }
             }
         }
 
-        private readonly TextBlock headerLabel;
+        private global::Windows.UI.Xaml.Controls.Button BackButton { get; }
+
+        private TextBlock HeaderLabel { get; }
 
         internal ViewStackHeader()
         {
-            headerLabel = new TextBlock()
+            ColumnDefinitions.Add(new ColumnDefinition() { Width = new global::Windows.UI.Xaml.GridLength(1, global::Windows.UI.Xaml.GridUnitType.Auto) });
+            ColumnDefinitions.Add(new ColumnDefinition() { Width = new global::Windows.UI.Xaml.GridLength(1, global::Windows.UI.Xaml.GridUnitType.Star) });
+            ColumnDefinitions.Add(new ColumnDefinition() { Width = new global::Windows.UI.Xaml.GridLength(1, global::Windows.UI.Xaml.GridUnitType.Auto) });
+
+            BackButton = new global::Windows.UI.Xaml.Controls.Button()
+            {
+                Name = "BackButton",
+                Background = new global::Windows.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Colors.Transparent),
+                Content = new SymbolIcon(Symbol.Back),
+                Margin = new global::Windows.UI.Xaml.Thickness(12, 0, 12, 0),
+                VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Center,
+                Visibility = global::Windows.UI.Xaml.Visibility.Collapsed
+            };
+
+            BackButton.Click += (o, e) =>
+            {
+                this.GetParent<INativeViewStack>()?.PopView(Animate.Default);
+            };
+            Children.Add(BackButton);
+
+            HeaderLabel = new TextBlock()
             {
                 HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Center,
-                VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Center
+                VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Center,
+                TextTrimming = global::Windows.UI.Xaml.TextTrimming.CharacterEllipsis
             };
-            Children.Add(headerLabel);
+            SetColumnSpan(HeaderLabel, 3);
+            Children.Add(HeaderLabel);
 
             BorderBrush = Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseLowBrushId);
             BorderThickness = new global::Windows.UI.Xaml.Thickness(0, 0, 0, 1);
@@ -327,6 +354,14 @@ namespace Prism.Windows.UI.Controls
             ArrangeRequest(false, null);
             finalSize = Frame.Size.GetSize();
             base.ArrangeOverride(finalSize);
+
+            double buttonWidth = ColumnDefinitions[0].ActualWidth;
+            double labelWidth = ColumnDefinitions[1].ActualWidth;
+            double menuWidth = ColumnDefinitions[2].ActualWidth;
+            double rightSide = ((buttonWidth + labelWidth + menuWidth) - Math.Min(HeaderLabel.ActualWidth, labelWidth)) / 2;
+            HeaderLabel.Margin = new global::Windows.UI.Xaml.Thickness(-Math.Max(menuWidth - rightSide, 0), 0, Math.Max(menuWidth - rightSide, 0), 0);
+            HeaderLabel.MaxWidth = labelWidth;
+
             return finalSize;
         }
 
@@ -338,6 +373,13 @@ namespace Prism.Windows.UI.Controls
         /// Infinity can be specified as a value to indicate that the object will size to whatever content is available.</param>
         protected override global::Windows.Foundation.Size MeasureOverride(global::Windows.Foundation.Size availableSize)
         {
+            var menu = Children.FirstOrDefault(c => c is INativeActionMenu) as FrameworkElement;
+            if (menu != null)
+            {
+                menu.Margin = new global::Windows.UI.Xaml.Thickness(12, 0, 12, 0);
+                SetColumn(menu, 2);
+            }
+
             var desiredSize = MeasureRequest(false, null).GetSize();
             base.MeasureOverride(desiredSize);
             return desiredSize;

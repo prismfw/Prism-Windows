@@ -346,12 +346,6 @@ namespace Prism.Windows.UI
             {
                 element.GetParent<Panel>()?.Children.Remove(element);
                 (this.GetParent<INativeViewStack>()?.Header as Panel)?.Children.Add(element);
-
-                var fwElement = element as FrameworkElement;
-                if (fwElement != null)
-                {
-                    fwElement.HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Right;
-                }
             }
         }
     }

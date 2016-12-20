@@ -132,7 +132,7 @@ namespace Prism.Windows.UI
         /// </summary>
         public object CurrentView
         {
-            get { return contentControl.Content; }
+            get { return views.LastOrDefault(); }
         }
 
         /// <summary>
@@ -162,7 +162,18 @@ namespace Prism.Windows.UI
         /// <summary>
         /// Gets or sets a value indicating whether the back button is enabled.
         /// </summary>
-        public bool IsBackButtonEnabled { get; set; }
+        public bool IsBackButtonEnabled
+        {
+            get { return ((UIElement)Header).GetChild<FrameworkElement>(e => e.Name == "BackButton")?.Visibility == global::Windows.UI.Xaml.Visibility.Visible; }
+            set
+            {
+                var backButton = ((UIElement)Header).GetChild<FrameworkElement>(e => e.Name == "BackButton");
+                if (backButton != null)
+                {
+                    backButton.Visibility = value ? global::Windows.UI.Xaml.Visibility.Visible : global::Windows.UI.Xaml.Visibility.Collapsed;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the header is hidden.
