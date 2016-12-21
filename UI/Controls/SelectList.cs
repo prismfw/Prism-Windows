@@ -489,8 +489,8 @@ namespace Prism.Windows.UI.Controls
             Margin = new global::Windows.UI.Xaml.Thickness();
             Padding = new global::Windows.UI.Xaml.Thickness();
             RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
-            VerticalContentAlignment = global::Windows.UI.Xaml.VerticalAlignment.Center;
-            HorizontalContentAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Center;
+            VerticalContentAlignment = global::Windows.UI.Xaml.VerticalAlignment.Top;
+            HorizontalContentAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Left;
 
             base.IsEnabledChanged += (o, e) =>
             {
