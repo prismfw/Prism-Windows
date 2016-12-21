@@ -289,7 +289,7 @@ namespace Prism.Windows.UI.Controls
                 Name = "BackButton",
                 Background = new global::Windows.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Colors.Transparent),
                 Content = new SymbolIcon(Symbol.Back),
-                Margin = new global::Windows.UI.Xaml.Thickness(12, 0, 12, 0),
+                Margin = new global::Windows.UI.Xaml.Thickness(6, 0, 15, 0),
                 VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Center,
                 Visibility = global::Windows.UI.Xaml.Visibility.Collapsed
             };
@@ -358,8 +358,8 @@ namespace Prism.Windows.UI.Controls
             double buttonWidth = ColumnDefinitions[0].ActualWidth;
             double labelWidth = ColumnDefinitions[1].ActualWidth;
             double menuWidth = ColumnDefinitions[2].ActualWidth;
-            double rightSide = ((buttonWidth + labelWidth + menuWidth) - Math.Min(HeaderLabel.ActualWidth, labelWidth)) / 2;
-            HeaderLabel.Margin = new global::Windows.UI.Xaml.Thickness(-Math.Max(menuWidth - rightSide, 0), 0, Math.Max(menuWidth - rightSide, 0), 0);
+            double sides = ((buttonWidth + labelWidth + menuWidth) - Math.Min(HeaderLabel.ActualWidth, labelWidth)) / 2;
+            HeaderLabel.Margin = new global::Windows.UI.Xaml.Thickness(Math.Max(buttonWidth - sides, 0) - Math.Max(menuWidth - sides, 0), 0, Math.Max(menuWidth - sides, 0), 0);
             HeaderLabel.MaxWidth = labelWidth;
 
             return finalSize;
