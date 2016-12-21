@@ -635,6 +635,7 @@ namespace Prism.Windows.UI.Controls
             var glyph = this.GetChild<FontIcon>(c => c.Name == "DropDownGlyph");
             if (glyph != null)
             {
+                glyph.MinHeight = 8;
                 glyph.Foreground = (glyphForeground ?? foreground).GetBrush() ??
                     Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseMediumHighBrushId);
             }
