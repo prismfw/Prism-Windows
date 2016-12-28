@@ -171,6 +171,7 @@ namespace Prism.Windows
                         return true;
                     case SystemResourceKeyId.AccentBrush:
                     case SystemResourceKeyId.ActivityIndicatorForegroundBrush:
+                    case SystemResourceKeyId.ProgressBarForegroundBrush:
                     case SystemResourceKeyId.SliderForegroundBrush:
                     case SystemResourceKeyId.ToggleSwitchForegroundBrush:
                         id = HighlightAccentBrushId;
@@ -191,6 +192,7 @@ namespace Prism.Windows
                         break;
                     case SystemResourceKeyId.ButtonBackgroundBrush:
                     case SystemResourceKeyId.DateTimePickerBackgroundBrush:
+                    case SystemResourceKeyId.ProgressBarBackgroundBrush:
                         id = BackgroundBaseLowBrushId;
                         break;
                     case SystemResourceKeyId.ButtonBorderBrush:
