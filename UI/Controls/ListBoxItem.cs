@@ -226,7 +226,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != base.Opacity)
                 {
                     base.Opacity = value;
-                    OnPropertyChanged(Prism.UI.Controls.Element.OpacityProperty);
+                    OnPropertyChanged(Prism.UI.Element.OpacityProperty);
                 }
             }
         }
@@ -309,7 +309,7 @@ namespace Prism.Windows.UI.Controls
                     base.Visibility = visibility == Prism.UI.Visibility.Visible ?
                         global::Windows.UI.Xaml.Visibility.Visible : global::Windows.UI.Xaml.Visibility.Collapsed;
 
-                    OnPropertyChanged(Prism.UI.Controls.Element.VisibilityProperty);
+                    OnPropertyChanged(Prism.UI.Element.VisibilityProperty);
                 }
             }
         }
