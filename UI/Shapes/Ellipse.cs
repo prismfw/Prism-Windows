@@ -385,20 +385,7 @@ namespace Prism.Windows.UI.Shapes
         /// <returns>The desired size as a <see cref="Size"/> instance.</returns>
         public Size Measure(Size constraints)
         {
-            try
-            {
-                Element.Width = double.NaN;
-                Element.Height = double.NaN;
-
-                base.Visibility = global::Windows.UI.Xaml.Visibility.Visible;
-                Element.Measure(constraints.GetSize());
-                return Element.DesiredSize.GetSize();
-            }
-            finally
-            {
-                base.Visibility = visibility == Prism.UI.Visibility.Visible ?
-                    global::Windows.UI.Xaml.Visibility.Visible : global::Windows.UI.Xaml.Visibility.Collapsed;
-            }
+            return constraints;
         }
 
         /// <summary>

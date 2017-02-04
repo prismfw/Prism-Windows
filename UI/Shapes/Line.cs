@@ -111,23 +111,6 @@ namespace Prism.Windows.UI.Shapes
         public ArrangeRequestHandler ArrangeRequest { get; set; }
 
         /// <summary>
-        /// Gets or sets the end point of the line.
-        /// </summary>
-        public Point EndPoint
-        {
-            get { return new Point(Element.X2, Element.Y2); }
-            set
-            {
-                if (value.X != Element.X2 || value.Y != Element.Y2)
-                {
-                    Element.X2 = value.X;
-                    Element.Y2 = value.Y;
-                    OnPropertyChanged(Prism.UI.Shapes.Line.EndPointProperty);
-                }
-            }
-        }
-
-        /// <summary>
         /// Gets or sets the <see cref="Brush"/> to apply to the interior of the shape.
         /// </summary>
         public Brush Fill
@@ -238,23 +221,6 @@ namespace Prism.Windows.UI.Shapes
         }
 
         /// <summary>
-        /// Gets or sets the start point of the line.
-        /// </summary>
-        public Point StartPoint
-        {
-            get { return new Point(Element.X1, Element.Y1); }
-            set
-            {
-                if (value.X != Element.X1 || value.Y != Element.Y1)
-                {
-                    Element.X1 = value.X;
-                    Element.Y1 = value.Y;
-                    OnPropertyChanged(Prism.UI.Shapes.Line.StartPointProperty);
-                }
-            }
-        }
-
-        /// <summary>
         /// Gets or sets the <see cref="Brush"/> to apply to the outline of the shape.
         /// </summary>
         public Brush Stroke
@@ -359,6 +325,70 @@ namespace Prism.Windows.UI.Shapes
         private Visibility visibility;
 
         /// <summary>
+        /// Gets or sets the X-coordinate of the start point of the line.
+        /// </summary>
+        public double X1
+        {
+            get { return Element.X1; }
+            set
+            {
+                if (value != Element.X1)
+                {
+                    Element.X1 = value;
+                    OnPropertyChanged(Prism.UI.Shapes.Line.X1Property);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the X-coordinate of the end point of the line.
+        /// </summary>
+        public double X2
+        {
+            get { return Element.X2; }
+            set
+            {
+                if (value != Element.X2)
+                {
+                    Element.X2 = value;
+                    OnPropertyChanged(Prism.UI.Shapes.Line.X2Property);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the Y-coordinate of the start point of the line.
+        /// </summary>
+        public double Y1
+        {
+            get { return Element.Y1; }
+            set
+            {
+                if (value != Element.Y1)
+                {
+                    Element.Y1 = value;
+                    OnPropertyChanged(Prism.UI.Shapes.Line.Y1Property);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the Y-coordinate of the end point of the line.
+        /// </summary>
+        public double Y2
+        {
+            get { return Element.Y2; }
+            set
+            {
+                if (value != Element.Y2)
+                {
+                    Element.Y2 = value;
+                    OnPropertyChanged(Prism.UI.Shapes.Line.Y2Property);
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets the UI element that is displaying the line.
         /// </summary>
         protected global::Windows.UI.Xaml.Shapes.Line Element { get; }
@@ -419,20 +449,7 @@ namespace Prism.Windows.UI.Shapes
         /// <returns>The desired size as a <see cref="Size"/> instance.</returns>
         public Size Measure(Size constraints)
         {
-            try
-            {
-                Element.Width = double.NaN;
-                Element.Height = double.NaN;
-
-                base.Visibility = global::Windows.UI.Xaml.Visibility.Visible;
-                Element.Measure(constraints.GetSize());
-                return Element.DesiredSize.GetSize();
-            }
-            finally
-            {
-                base.Visibility = visibility == Prism.UI.Visibility.Visible ?
-                    global::Windows.UI.Xaml.Visibility.Visible : global::Windows.UI.Xaml.Visibility.Collapsed;
-            }
+            return constraints;
         }
 
         /// <summary>
