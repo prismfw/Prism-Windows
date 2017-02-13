@@ -406,9 +406,50 @@ namespace Prism.Windows.UI.Controls
         }
 
         /// <summary>
+        /// Gets or sets the background of the selection list.
+        /// </summary>
+        public Brush ListBackground
+        {
+            get { return listBackground; }
+            set
+            {
+                if (value != listBackground)
+                {
+                    listBackground = value;
+
+                    var popup = GetTemplateChild("PopupBorder") as global::Windows.UI.Xaml.Controls.Border;
+                    if (popup != null)
+                    {
+                        popup.Background = listBackground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.BackgroundChromeMediumLowBrushId);
+                    }
+
+                    OnPropertyChanged(Prism.UI.Controls.SelectList.ListBackgroundProperty);
+                }
+            }
+        }
+        private Brush listBackground;
+
+        /// <summary>
         /// Gets or sets the method to invoke when this instance requests a list item for an object in the select list.
         /// </summary>
         public SelectListListItemRequestHandler ListItemRequest { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="Brush"/> to apply to the separators in the selection list, if applicable.
+        /// </summary>
+        public Brush ListSeparatorBrush
+        {
+            get { return listSeparatorBrush; }
+            set
+            {
+                if (value != listSeparatorBrush)
+                {
+                    listSeparatorBrush = value;
+                    OnPropertyChanged(Prism.UI.Controls.SelectList.ListSeparatorBrushProperty);
+                }
+            }
+        }
+        private Brush listSeparatorBrush;
 
         /// <summary>
         /// Gets or sets the method to invoke when this instance requests a measurement of itself and its children.
@@ -638,6 +679,12 @@ namespace Prism.Windows.UI.Controls
                 glyph.MinHeight = 8;
                 glyph.Foreground = (glyphForeground ?? foreground).GetBrush() ??
                     Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseMediumHighBrushId);
+            }
+
+            var popup = GetTemplateChild("PopupBorder") as global::Windows.UI.Xaml.Controls.Border;
+            if (popup != null)
+            {
+                popup.Background = listBackground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.BackgroundChromeMediumLowBrushId);
             }
         }
 

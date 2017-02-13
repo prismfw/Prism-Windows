@@ -177,6 +177,7 @@ namespace Prism.Windows
                         id = HighlightAccentBrushId;
                         break;
                     case SystemResourceKeyId.ActionMenuBackgroundBrush:
+                    case SystemResourceKeyId.SelectListListBackgroundBrush:
                         id = BackgroundChromeMediumLowBrushId;
                         break;
                     case SystemResourceKeyId.ActionMenuForegroundBrush:
@@ -252,6 +253,9 @@ namespace Prism.Windows
                     case SystemResourceKeyId.ViewHeaderBackgroundBrush:
                         id = PageBackgroundChromeLowBrushId;
                         break;
+                    case SystemResourceKeyId.SelectListListSeparatorBrush:
+                        value = null;
+                        return true;
                 }
             }
 
