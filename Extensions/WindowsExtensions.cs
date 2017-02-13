@@ -381,6 +381,26 @@ namespace Prism.Windows
         }
 
         /// <summary>
+        /// Gets an <see cref="global::Windows.UI.Xaml.Media.SweepDirection"/> from a <see cref="Prism.UI.Media.SweepDirection"/>.
+        /// </summary>
+        /// <param name="sweepDirection">The sweep direction.</param>
+        public static global::Windows.UI.Xaml.Media.SweepDirection GetSweepDirection(this Prism.UI.Media.SweepDirection sweepDirection)
+        {
+            return sweepDirection == Prism.UI.Media.SweepDirection.Counterclockwise ?
+                global::Windows.UI.Xaml.Media.SweepDirection.Counterclockwise : global::Windows.UI.Xaml.Media.SweepDirection.Clockwise;
+        }
+
+        /// <summary>
+        /// Gets an <see cref="Prism.UI.Media.SweepDirection"/> from a <see cref="global::Windows.UI.Xaml.Media.SweepDirection"/>.
+        /// </summary>
+        /// <param name="sweepDirection">The sweep direction.</param>
+        public static Prism.UI.Media.SweepDirection GetSweepDirection(this global::Windows.UI.Xaml.Media.SweepDirection sweepDirection)
+        {
+            return sweepDirection == global::Windows.UI.Xaml.Media.SweepDirection.Counterclockwise ?
+                Prism.UI.Media.SweepDirection.Counterclockwise : Prism.UI.Media.SweepDirection.Clockwise;
+        }
+
+        /// <summary>
         /// Gets a <see cref="global::Windows.UI.Xaml.TextAlignment"/> from a <see cref="Prism.UI.TextAlignment"/>.
         /// </summary>
         /// <param name="textAlignment">The text alignment.</param>

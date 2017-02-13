@@ -140,6 +140,7 @@
     <Compile Include="UI\Media\Inking\InkStroke.cs" />
     <Compile Include="UI\Media\Imaging\ImageSource.cs" />
     <Compile Include="UI\Media\Imaging\RenderTargetBitmap.cs" />
+    <Compile Include="UI\Shapes\Path.cs" />
     <Compile Include="UI\Shapes\Quadrangle.cs" />
     <Compile Include="UI\Shapes\Polyline.cs" />
     <Compile Include="UI\Shapes\PolyShapeBase.cs" />
