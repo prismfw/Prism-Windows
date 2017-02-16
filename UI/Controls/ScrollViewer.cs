@@ -424,6 +424,22 @@ namespace Prism.Windows.UI.Controls
         }
 
         /// <summary>
+        /// Invoked whenever application code or internal processes (such as a rebuilding layout pass) call ApplyTemplate.
+        /// In simplest terms, this means the method is called just before a UI element displays in your app.
+        /// Override this method to influence the default post-template logic of a class.
+        /// </summary>
+        protected override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+            var presenter = this.GetChild<ContentPresenter>();
+            if (presenter != null)
+            {
+                presenter.HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Stretch;
+            }
+        }
+
+        /// <summary>
         /// Called when a property value is changed.
         /// </summary>
         /// <param name="pd">A property descriptor describing the property whose value has been changed.</param>
