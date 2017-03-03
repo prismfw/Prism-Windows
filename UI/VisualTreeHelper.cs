@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 
+using System.Linq;
 using Prism.Native;
 using Windows.UI.Xaml;
 
@@ -44,7 +45,19 @@ namespace Prism.Windows.UI
             }
 
             var dep = reference as DependencyObject;
-            return dep == null ? 0 : global::Windows.UI.Xaml.Media.VisualTreeHelper.GetChildrenCount(dep);
+            if (dep == null)
+            {
+                return 0;
+            }
+
+            int count = 0;
+            var viewStack = reference as INativeViewStack;
+            if (viewStack != null)
+            {
+                count = viewStack.Views.Count(o => o != viewStack.CurrentView);
+            }
+
+            return global::Windows.UI.Xaml.Media.VisualTreeHelper.GetChildrenCount(dep) + count;
         }
 
         /// <summary>
@@ -62,7 +75,19 @@ namespace Prism.Windows.UI
             }
 
             var dep = reference as DependencyObject;
-            return dep == null ? null : global::Windows.UI.Xaml.Media.VisualTreeHelper.GetChild(dep, childIndex);
+            if (dep == null)
+            {
+                return null;
+            }
+
+            int childCount = global::Windows.UI.Xaml.Media.VisualTreeHelper.GetChildrenCount(dep);
+            if (childIndex >= childCount)
+            {
+                var viewStack = reference as INativeViewStack;
+                return viewStack == null ? null : viewStack.Views.Where(o => o != viewStack.CurrentView).ElementAtOrDefault(childIndex - childCount);
+            }
+
+            return global::Windows.UI.Xaml.Media.VisualTreeHelper.GetChild(dep, childIndex);
         }
 
         /// <summary>
@@ -79,7 +104,7 @@ namespace Prism.Windows.UI
             }
 
             var dep = reference as DependencyObject;
-            return dep == null ? null : global::Windows.UI.Xaml.Media.VisualTreeHelper.GetParent(dep);
+            return (dep == null ? null : global::Windows.UI.Xaml.Media.VisualTreeHelper.GetParent(dep)) ?? (reference as IViewStackChild)?.ViewStack;
         }
     }
 }

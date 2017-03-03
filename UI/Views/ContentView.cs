@@ -34,7 +34,7 @@ namespace Prism.Windows.UI
     /// Represents a Windows implementation for an <see cref="INativeContentView"/>.
     /// </summary>
     [Register(typeof(INativeContentView))]
-    public class ContentView : Page, INativeContentView
+    public class ContentView : Page, INativeContentView, IViewStackChild
     {
         /// <summary>
         /// Occurs when this instance has been attached to the visual tree and is ready to be rendered.
@@ -247,7 +247,12 @@ namespace Prism.Windows.UI
             }
         }
         private string title;
-        
+
+        /// <summary>
+        /// Gets or sets the view stack of which this instance is a child.
+        /// </summary>
+        public DependencyObject ViewStack { get; set; }
+
         private readonly Canvas contentCanvas;
 
         /// <summary>

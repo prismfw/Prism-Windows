@@ -299,6 +299,13 @@ namespace Prism.Windows.UI
         public void InsertView(object view, int index, Animate animate)
         {
             views.Insert(index, view);
+
+            var vsc = view as IViewStackChild;
+            if (vsc != null)
+            {
+                vsc.ViewStack = this;
+            }
+
             if (views.Last() == view)
             {
                 ViewChanging(this, new NativeViewStackViewChangingEventArgs(contentControl.Content, view));
@@ -342,6 +349,13 @@ namespace Prism.Windows.UI
             }
             
             views.RemoveAt(views.Count - 1);
+
+            var vsc = last as IViewStackChild;
+            if (vsc != null)
+            {
+                vsc.ViewStack = null;
+            }
+
             ViewChanging(this, new NativeViewStackViewChangingEventArgs(contentControl.Content, views.Last()));
             contentControl.Content = views.Last();
             return last;
@@ -374,6 +388,11 @@ namespace Prism.Windows.UI
 
             var popped = views.Skip(1);
             views.RemoveRange(1, views.Count - 1);
+
+            foreach (var vsc in popped.OfType<IViewStackChild>())
+            {
+                vsc.ViewStack = null;
+            }
 
             ViewChanging(this, new NativeViewStackViewChangingEventArgs(contentControl.Content, views.Last()));
             contentControl.Content = views.Last();
@@ -411,6 +430,11 @@ namespace Prism.Windows.UI
             var popped = views.Skip(++index);
             views.RemoveRange(index, views.Count - index);
 
+            foreach (var vsc in popped.OfType<IViewStackChild>())
+            {
+                vsc.ViewStack = null;
+            }
+
             ViewChanging(this, new NativeViewStackViewChangingEventArgs(contentControl.Content, view));
             contentControl.Content = view;
             return popped.ToArray();
@@ -424,6 +448,13 @@ namespace Prism.Windows.UI
         public void PushView(object view, Animate animate)
         {
             views.Add(view);
+
+            var vsc = view as IViewStackChild;
+            if (vsc != null)
+            {
+                vsc.ViewStack = this;
+            }
+
             ViewChanging(this, new NativeViewStackViewChangingEventArgs(contentControl.Content, view));
             contentControl.Content = view;
         }
@@ -437,8 +468,20 @@ namespace Prism.Windows.UI
         public void ReplaceView(object oldView, object newView, Animate animate)
         {
             int index = views.IndexOf(oldView);
-
             views[index] = newView;
+
+            var vsc = oldView as IViewStackChild;
+            if (vsc != null)
+            {
+                vsc.ViewStack = null;
+            }
+
+            vsc = newView as IViewStackChild;
+            if (vsc != null)
+            {
+                vsc.ViewStack = this;
+            }
+
             if (index == views.Count - 1)
             {
                 ViewChanging(this, new NativeViewStackViewChangingEventArgs(oldView, newView));
