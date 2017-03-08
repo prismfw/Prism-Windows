@@ -37,7 +37,7 @@ namespace Prism.Windows.UI
     /// Represents a Windows implementation for an <see cref="INativeTabView"/>.
     /// </summary>
     [Register(typeof(INativeTabView))]
-    public class TabView : global::Windows.UI.Xaml.Controls.SplitView, INativeTabView
+    public class TabView : ContentControl, INativeTabView
     {
         /// <summary>
         /// Occurs when this instance has been attached to the visual tree and is ready to be rendered.
@@ -60,23 +60,6 @@ namespace Prism.Windows.UI
         public new event EventHandler Unloaded;
 
         /// <summary>
-        /// Gets or sets the foreground for the button that activates the side pane.
-        /// </summary>
-        public Brush ActivationButtonForeground
-        {
-            get { return activationButtonForeground; }
-            set
-            {
-                activationButtonForeground = value;
-                if (ActivationButton != null)
-                {
-                    ActivationButton.Foreground = value.GetBrush();
-                }
-            }
-        }
-        private Brush activationButtonForeground;
-
-        /// <summary>
         /// Gets or sets a value indicating whether animations are enabled for this instance.
         /// </summary>
         public bool AreAnimationsEnabled
@@ -90,11 +73,21 @@ namespace Prism.Windows.UI
                     if (areAnimationsEnabled)
                     {
                         Transitions = transitions;
+                        ContentTransitions = contentTransitions;
+                        Element.Transitions = elementTransitions;
+                        Element.ItemContainerTransitions = itemContainerTransitions;
                     }
                     else
                     {
                         transitions = Transitions;
+                        contentTransitions = ContentTransitions;
+                        elementTransitions = Element.Transitions;
+                        itemContainerTransitions = Element.ItemContainerTransitions;
+
                         Transitions = null;
+                        ContentTransitions = null;
+                        Element.Transitions = null;
+                        Element.ItemContainerTransitions = null;
                     }
 
                     OnPropertyChanged(Visual.AreAnimationsEnabledProperty);
@@ -102,7 +95,7 @@ namespace Prism.Windows.UI
             }
         }
         private bool areAnimationsEnabled = true;
-        private TransitionCollection transitions;
+        private TransitionCollection transitions, contentTransitions, elementTransitions, itemContainerTransitions;
 
         /// <summary>
         /// Gets or sets the method to invoke when this instance requests an arrangement of its children.
@@ -120,7 +113,13 @@ namespace Prism.Windows.UI
                 if (value != background)
                 {
                     background = value;
-                    PaneBackground = background.GetBrush();
+
+                    var headerPanel = this.GetChild<PivotHeaderPanel>(c => c.Visibility != global::Windows.UI.Xaml.Visibility.Collapsed)?.Parent as Panel;
+                    if (headerPanel != null)
+                    {
+                        headerPanel.Background = background.GetBrush();
+                    }
+
                     OnPropertyChanged(Prism.UI.TabView.BackgroundProperty);
                 }
             }
@@ -138,11 +137,28 @@ namespace Prism.Windows.UI
                 if (value != foreground)
                 {
                     foreground = value;
-                    foreach (var presenter in ListView.Items.Select(i => (i as DependencyObject).GetParent<ListViewItemPresenter>()).Where(p => p != null))
+                    
+                    var tabHeader = (Element.SelectedItem as PivotItem)?.Header as DependencyObject;
+                    if (tabHeader != null)
                     {
-                        presenter.SelectedBackground = presenter.SelectedPointerOverBackground = foreground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.HighlightListAccentLowBrushId);
-                    }
+                        var brush = foreground.GetBrush();
 
+                        var textBlock = tabHeader.GetChild<TextBlock>(c => c.Name == "title");
+                        if (textBlock != null)
+                        {
+                            textBlock.Foreground = brush;
+                        }
+
+                        // TODO: Tint the tab image.
+
+                        var rect = tabHeader.GetChild<global::Windows.UI.Xaml.Shapes.Rectangle>(c => c.Name == "rect");
+                        if (rect != null)
+                        {
+                            rect.Fill = brush;
+                            rect.Opacity = 1;
+                        }
+                    }
+                    
                     OnPropertyChanged(Prism.UI.TabView.ForegroundProperty);
                 }
             }
@@ -226,13 +242,12 @@ namespace Prism.Windows.UI
         /// </summary>
         public int SelectedIndex
         {
-            get { return ListView.SelectedIndex; }
+            get { return Element.SelectedIndex; }
             set
             {
-                if (value != ListView.SelectedIndex)
+                if (value != Element.SelectedIndex)
                 {
-                    ListView.SelectedIndex = value;
-                    OnPropertyChanged(Prism.UI.TabView.SelectedIndexProperty);
+                    Element.SelectedIndex = value;
                 }
             }
         }
@@ -242,103 +257,74 @@ namespace Prism.Windows.UI
         /// </summary>
         public Rectangle TabBarFrame
         {
-            get
-            {
-                double width = 0;
-                if ((DisplayMode == SplitViewDisplayMode.Inline || DisplayMode == SplitViewDisplayMode.CompactInline) && IsPaneOpen)
-                {
-                    width = OpenPaneLength;
-                }
-                else if (DisplayMode == SplitViewDisplayMode.CompactInline || DisplayMode == SplitViewDisplayMode.CompactOverlay)
-                {
-                    width = CompactPaneLength;
-                }
-
-                return new Rectangle(PanePlacement == SplitViewPanePlacement.Right ? Math.Max(ActualWidth - width, 0) : 0, 0, width, ActualHeight);
-            }
+            get { return new Rectangle(0, 0, ActualWidth, TabBarHeight); }
         }
+
+        /// <summary>
+        /// Gets or sets the height of the tab bar.
+        /// </summary>
+        public double TabBarHeight { get; set; } = 72;
 
         /// <summary>
         /// Gets a list of the tab items that are a part of the view.
         /// </summary>
         public IList TabItems
         {
-            get { return tabItems; }
+            get { return Element.ItemsSource as IList; }
         }
-        private readonly ObservableCollection<object> tabItems = new ObservableCollection<object>();
 
         /// <summary>
-        /// Gets the button element that opens the tab menu when clicked.
+        /// Gets the UI element that displays the tab items.
         /// </summary>
-        protected Button ActivationButton { get; }
-
-        /// <summary>
-        /// Gets the element that contains the tab items.
-        /// </summary>
-        protected ListView ListView { get; }
-
-        private long callbackToken;
-        private object currentTab;
+        protected Pivot Element { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TabView"/> class.
         /// </summary>
         public TabView()
         {
-            Pane = new StackPanel()
+            Content = Element = new Pivot() { ItemsSource = new ObservableCollection<object>() };
+            Element.SelectionChanged += (o, e) =>
             {
-                Orientation = global::Windows.UI.Xaml.Controls.Orientation.Vertical,
-                VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Stretch,
-                Children =
+                var newTab = e.AddedItems.FirstOrDefault();
+                var oldTab = e.RemovedItems.FirstOrDefault();
+
+                if ((newTab as INativeTabItem)?.IsEnabled ?? true)
                 {
-                    (ActivationButton = new Button()
+                    SetSelectedForeground();
+
+                    OnPropertyChanged(Prism.UI.TabView.SelectedIndexProperty);
+                    TabItemSelected(this, new NativeItemSelectedEventArgs(oldTab, newTab));
+                }
+                else
+                {
+                    int newIndex = TabItems.IndexOf(newTab);
+                    int oldIndex = TabItems.IndexOf(oldTab);
+
+                    if (newIndex > oldIndex)
                     {
-                        Background = new global::Windows.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Colors.Transparent),
-                        Content = new SymbolIcon(Symbol.List), // temporary icon
-                        Height = 48,
-                        Width = 48
-                    }),
-                    (ListView = new ListView()
+                        Element.SelectedIndex = (Element.SelectedIndex == TabItems.Count - 1) ? 0 : ++newIndex;
+                    }
+                    else
                     {
-                        IsItemClickEnabled = true,
-                        ItemsSource = tabItems
-                    })
+                        Element.SelectedIndex = (Element.SelectedIndex == 0) ? TabItems.Count - 1 : --newIndex;
+                    }
                 }
             };
-
-            ActivationButton.Click += (o, e) =>
-            {
-                IsPaneOpen = !IsPaneOpen;
-            };
-
-            ListView.ItemClick += (o, e) =>
-            {
-                if (TabItems.IndexOf(e.ClickedItem) == ListView.SelectedIndex)
-                {
-                    TabItemSelected(this, new NativeItemSelectedEventArgs(currentTab, e.ClickedItem));
-                    currentTab = e.ClickedItem;
-                }
-            };
-
-            ListView.SelectionChanged += (o, e) =>
-            {
-                OnPropertyChanged(Prism.UI.TabView.SelectedIndexProperty);
-
-                TabItemSelected(this, new NativeItemSelectedEventArgs(currentTab, ListView.SelectedItem));
-                currentTab = ListView.SelectedItem;
-
-                ChangeContent((e.RemovedItems.FirstOrDefault() as INativeTabItem)?.Content, (ListView.SelectedItem as INativeTabItem)?.Content);
-            };
-
-            DisplayMode = SplitViewDisplayMode.CompactOverlay;
-            OpenPaneLength = 280;
+            
             RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
 
             base.Loaded += (o, e) =>
             {
-                if (ListView.SelectedIndex < 0 && tabItems.Count > 0)
+                var headerPanel = this.GetChild<PivotHeaderPanel>(c => c.Visibility != global::Windows.UI.Xaml.Visibility.Collapsed)?.Parent as Panel;
+                if (headerPanel != null)
                 {
-                    ListView.SelectedIndex = 0;
+                    headerPanel.Background = background.GetBrush();
+                }
+
+                if (Element.SelectedIndex < 0 && TabItems.Count > 0)
+                {
+                    Element.SelectedIndex = 0;
                 }
 
                 if (!IsLoaded)
@@ -378,6 +364,16 @@ namespace Prism.Windows.UI
             ArrangeRequest(false, null);
             finalSize = Frame.Size.GetSize();
             base.ArrangeOverride(finalSize);
+
+            var panel = this.GetChild<PivotHeaderPanel>(c => c.Visibility != global::Windows.UI.Xaml.Visibility.Collapsed);
+            if (panel != null)
+            {
+                panel.Height = TabBarHeight;
+                panel.HorizontalAlignment = panel.Name == "StaticHeader" && finalSize.Width < 720 ?
+                    global::Windows.UI.Xaml.HorizontalAlignment.Center : global::Windows.UI.Xaml.HorizontalAlignment.Left;
+            }
+
+
             return finalSize;
         }
 
@@ -395,6 +391,19 @@ namespace Prism.Windows.UI
         }
 
         /// <summary>
+        /// Called when a tab item in the view is clicked or tapped.
+        /// </summary>
+        /// <param name="item">The tab item that was clicked.</param>
+        protected internal void OnTabItemClicked(INativeTabItem item)
+        {
+            // This should only fire if the tab is already the active one.
+            if (Element.SelectedIndex == TabItems.IndexOf(item))
+            {
+                TabItemSelected(this, new NativeItemSelectedEventArgs(item, item));
+            }
+        }
+
+        /// <summary>
         /// Called when a property value is changed.
         /// </summary>
         /// <param name="pd">A property descriptor describing the property whose value has been changed.</param>
@@ -403,17 +412,38 @@ namespace Prism.Windows.UI
             PropertyChanged(this, new FrameworkPropertyChangedEventArgs(pd));
         }
 
-        private void ChangeContent(object oldContent, object newContent)
+        private void SetSelectedForeground()
         {
-            (oldContent as DependencyObject)?.UnregisterPropertyChangedCallback(Control.BackgroundProperty, callbackToken);
-
-            Content = newContent as UIElement;
-
-            var control = newContent as Control;
-            if (control != null)
+            var panel = this.GetChild<PivotHeaderPanel>(p => p.Visibility != global::Windows.UI.Xaml.Visibility.Collapsed);
+            if (panel != null)
             {
-                base.Background = control.Background;
-                callbackToken = control.RegisterPropertyChangedCallback(Control.BackgroundProperty, (o, e) => { base.Background = ((Control)o).Background; });
+                for (int i = 0; i < panel.Children.Count; i++)
+                {
+                    var item = panel.Children[i];
+
+                    var textBlock = item.GetChild<TextBlock>(c => c.Name == "Title");
+                    if (textBlock != null)
+                    {
+                        textBlock.Foreground = i == Element.SelectedIndex ? foreground.GetBrush() :
+                            ((TabItems[i] as INativeTabItem)?.Foreground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseMediumLowBrushId));
+                    }
+
+                    // TODO: Tint the tab image.
+
+                    var rect = item.GetChild<global::Windows.UI.Xaml.Shapes.Rectangle>(c => c.Name == "Rect");
+                    if (rect != null)
+                    {
+                        if (i == Element.SelectedIndex)
+                        {
+                            rect.Fill = foreground.GetBrush();
+                            rect.Opacity = 1;
+                        }
+                        else
+                        {
+                            rect.Opacity = 0;
+                        }
+                    }
+                }
             }
         }
     }

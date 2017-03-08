@@ -183,7 +183,6 @@
     <Compile Include="UI\Popup.cs" />
     <Compile Include="UI\Views\ContentView.cs" />
     <Compile Include="UI\Views\SplitView.cs" />
-    <Compile Include="UI\Views\TabbedSplitView.cs" />
     <Compile Include="UI\Views\TabView.cs" />
     <Compile Include="UI\Views\ViewStack.cs" />
     <Compile Include="UI\VisualTreeHelper.cs" />

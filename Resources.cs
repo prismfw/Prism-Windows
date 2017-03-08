@@ -173,6 +173,7 @@ namespace Prism.Windows
                     case SystemResourceKeyId.ActivityIndicatorForegroundBrush:
                     case SystemResourceKeyId.ProgressBarForegroundBrush:
                     case SystemResourceKeyId.SliderForegroundBrush:
+                    case SystemResourceKeyId.TabViewForegroundBrush:
                     case SystemResourceKeyId.ToggleSwitchForegroundBrush:
                         id = HighlightAccentBrushId;
                         break;
@@ -211,12 +212,10 @@ namespace Prism.Windows
                     case SystemResourceKeyId.LabelForegroundBrush:
                     case SystemResourceKeyId.LoadIndicatorForegroundBrush:
                     case SystemResourceKeyId.SectionHeaderForegroundBrush:
-                    case SystemResourceKeyId.TabItemForegroundBrush:
                     case SystemResourceKeyId.ViewHeaderForegroundBrush:
                         id = PageTextBaseHighBrushId;
                         break;
                     case SystemResourceKeyId.ListBoxItemSelectedBackgroundBrush:
-                    case SystemResourceKeyId.TabViewForegroundBrush:
                         id = HighlightListAccentLowBrushId;
                         break;
                     case SystemResourceKeyId.ListBoxSeparatorBrush:
@@ -236,6 +235,7 @@ namespace Prism.Windows
                         break;
                     case SystemResourceKeyId.SelectListBorderBrush:
                     case SystemResourceKeyId.SliderBackgroundBrush:
+                    case SystemResourceKeyId.TabItemForegroundBrush:
                         id = ForegroundBaseMediumLowBrushId;
                         break;
                     case SystemResourceKeyId.SliderThumbBrush:

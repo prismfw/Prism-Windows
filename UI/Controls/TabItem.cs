@@ -25,6 +25,7 @@ using Prism.UI.Media;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Markup;
 using Windows.UI.Xaml.Media.Animation;
 
 namespace Prism.Windows.UI.Controls
@@ -33,7 +34,7 @@ namespace Prism.Windows.UI.Controls
     /// Represents a Windows implementation of an <see cref="INativeTabItem"/>.
     /// </summary>
     [Register(typeof(INativeTabItem))]
-    public class TabItem : StackPanel, INativeTabItem
+    public class TabItem : PivotItem, INativeTabItem
     {
         /// <summary>
         /// Occurs when this instance has been attached to the visual tree and is ready to be rendered.
@@ -64,15 +65,15 @@ namespace Prism.Windows.UI.Controls
                     if (areAnimationsEnabled)
                     {
                         Transitions = transitions;
-                        ChildrenTransitions = childrenTransitions;
+                        ContentTransitions = contentTransitions;
                     }
                     else
                     {
                         transitions = Transitions;
-                        childrenTransitions = ChildrenTransitions;
+                        contentTransitions = ContentTransitions;
 
                         Transitions = null;
-                        ChildrenTransitions = null;
+                        ContentTransitions = null;
                     }
 
                     OnPropertyChanged(Prism.UI.Visual.AreAnimationsEnabledProperty);
@@ -80,7 +81,7 @@ namespace Prism.Windows.UI.Controls
             }
         }
         private bool areAnimationsEnabled = true;
-        private TransitionCollection transitions, childrenTransitions;
+        private TransitionCollection transitions, contentTransitions;
 
         /// <summary>
         /// Gets or sets the method to invoke when this instance requests an arrangement of its children.
@@ -91,41 +92,28 @@ namespace Prism.Windows.UI.Controls
         /// Gets or sets the object that acts as the content of the item.
         /// This is typically an <see cref="IView"/> or <see cref="INativeViewStack"/> instance.
         /// </summary>
-        public object Content
+        public new object Content
         {
-            get { return content; }
+            get { return base.Content; }
             set
             {
-                content = value;
+                (base.Content as DependencyObject)?.UnregisterPropertyChangedCallback(Control.BackgroundProperty, callbackToken);
 
-                var tabView = this.GetParent<INativeTabView>();
-                if (tabView != null && tabView.SelectedIndex == tabView.TabItems.IndexOf(this))
+                base.Content = value;
+
+                var control = value as Control;
+                if (control != null)
                 {
-                    var splitView = tabView as global::Windows.UI.Xaml.Controls.SplitView;
-                    if (splitView != null)
-                    {
-                        if (tabView is INativeTabbedSplitView)
-                        {
-                            splitView = splitView.Content as global::Windows.UI.Xaml.Controls.SplitView;
-                            if (splitView != null)
-                            {
-                                splitView.Pane = content as UIElement;
-                            }
-                        }
-                        else
-                        {
-                            splitView.Content = content as UIElement;
-                        }
-                    }
+                    Background = control.Background;
+                    callbackToken = control.RegisterPropertyChangedCallback(Control.BackgroundProperty, (o, e) => { Background = ((Control)o).Background; });
                 }
             }
         }
-        private object content;
 
         /// <summary>
         /// Gets or sets the font to use for displaying the title text.
         /// </summary>
-        public object FontFamily
+        public new object FontFamily
         {
             get { return TextBlock.FontFamily; }
             set
@@ -134,7 +122,7 @@ namespace Prism.Windows.UI.Controls
                 if (fontFamily != TextBlock.FontFamily)
                 {
                     TextBlock.SetFont(fontFamily, FontStyle);
-                    OnPropertyChanged(Prism.UI.Controls.Label.FontFamilyProperty);
+                    OnPropertyChanged(Prism.UI.Controls.TabItem.FontFamilyProperty);
                 }
             }
         }
@@ -142,7 +130,7 @@ namespace Prism.Windows.UI.Controls
         /// <summary>
         /// Gets or sets the size of the title text.
         /// </summary>
-        public double FontSize
+        public new double FontSize
         {
             get { return TextBlock.FontSize; }
             set
@@ -150,7 +138,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != TextBlock.FontSize)
                 {
                     TextBlock.FontSize = value;
-                    OnPropertyChanged(Prism.UI.Controls.Label.FontSizeProperty);
+                    OnPropertyChanged(Prism.UI.Controls.TabItem.FontSizeProperty);
                 }
             }
         }
@@ -158,7 +146,7 @@ namespace Prism.Windows.UI.Controls
         /// <summary>
         /// Gets or sets the style with which to render the title text.
         /// </summary>
-        public FontStyle FontStyle
+        public new FontStyle FontStyle
         {
             get { return TextBlock.GetFontStyle(); }
             set
@@ -169,7 +157,7 @@ namespace Prism.Windows.UI.Controls
 
                 if (TextBlock.FontStyle != style || TextBlock.FontWeight.Weight != weight)
                 {
-                    OnPropertyChanged(Prism.UI.Controls.Label.FontStyleProperty);
+                    OnPropertyChanged(Prism.UI.Controls.TabItem.FontStyleProperty);
                 }
             }
         }
@@ -177,7 +165,7 @@ namespace Prism.Windows.UI.Controls
         /// <summary>
         /// Gets or sets the <see cref="Brush"/> to apply to the title.
         /// </summary>
-        public Brush Foreground
+        public new Brush Foreground
         {
             get { return foreground; }
             set
@@ -185,7 +173,11 @@ namespace Prism.Windows.UI.Controls
                 if (value != foreground)
                 {
                     foreground = value;
-                    TextBlock.Foreground = foreground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.PageTextBaseHighBrushId);
+                    if (this.GetParent<Pivot>()?.SelectedItem != this)
+                    {
+                        TextBlock.Foreground = foreground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.ForegroundBaseMediumLowBrushId);
+                    }
+
                     OnPropertyChanged(Prism.UI.Controls.TabItem.ForegroundProperty);
                 }
             }
@@ -195,59 +187,80 @@ namespace Prism.Windows.UI.Controls
         /// <summary>
         /// Gets or sets a <see cref="Rectangle"/> that represents the size and position of the object relative to its parent container.
         /// </summary>
-        public Rectangle Frame
-        {
-            get { return frame; }
-            set
-            {
-                frame = value;
-
-                Width = value.Width;
-                Height = value.Height;
-            }
-        }
-        private Rectangle frame = new Rectangle();
+        public Rectangle Frame { get; set; }
 
         /// <summary>
         /// Gets or sets an <see cref="INativeImageSource"/> for an image to display with the item.
         /// </summary>
-        public INativeImageSource ImageSource
+        public INativeImageSource Image
         {
-            get { return imageSource; }
+            get { return image; }
             set
             {
-                if (value != imageSource)
+                if (value != image)
                 {
-                    imageSource = value;
-                    Image.Source = imageSource.GetImageSource();
-                    OnPropertyChanged(Prism.UI.Controls.TabItem.ImageSourceProperty);
+                    image = value;
+                    ImageElement.Source = image.GetImageSource();
+                    ImageElement.Visibility = ImageElement.Source == null ? Visibility.Collapsed : Visibility.Visible;
+                    OnPropertyChanged(Prism.UI.Controls.TabItem.ImageProperty);
                 }
             }
         }
-        private INativeImageSource imageSource;
+        private INativeImageSource image;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the user can interact with the item.
+        /// </summary>
+        public new bool IsEnabled
+        {
+            get { return isEnabled; }
+            set
+            {
+                if (value != isEnabled)
+                {
+                    isEnabled = value;
+
+                    var element = Header as UIElement;
+                    if (element != null)
+                    {
+                        element.Opacity = value ? 1.0 : 0.4;
+                    }
+
+                    var item = (Header as DependencyObject)?.GetParent<PivotHeaderItem>();
+                    if (item != null)
+                    {
+                        item.IsEnabled = value;
+                    }
+
+                    OnPropertyChanged(Prism.UI.Controls.TabItem.IsEnabledProperty);
+                }
+            }
+        }
+        private bool isEnabled = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance can be considered a valid result for hit testing.
         /// </summary>
         public new bool IsHitTestVisible
         {
-            get { return base.IsHitTestVisible; }
+            get { return isHitTestVisible; }
             set
             {
-                if (value != base.IsHitTestVisible)
+                if (value != isHitTestVisible)
                 {
-                    base.IsHitTestVisible = value;
+                    isHitTestVisible = value;
 
-                    var presenter = this.GetParent<ListViewItemPresenter>();
-                    if (presenter != null)
+                    var item = (Header as DependencyObject)?.GetParent<PivotHeaderItem>();
+                    if (item != null)
                     {
-                        presenter.IsHitTestVisible = base.IsHitTestVisible;
+                        item.IsHitTestVisible = value;
                     }
 
                     OnPropertyChanged(Prism.UI.Visual.IsHitTestVisibleProperty);
                 }
             }
         }
+        private bool isHitTestVisible = true;
 
         /// <summary>
         /// Gets a value indicating whether this instance has been loaded and is ready for rendering.
@@ -270,7 +283,13 @@ namespace Prism.Windows.UI.Controls
                 if (value != renderTransform)
                 {
                     renderTransform = value;
-                    base.RenderTransform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
+
+                    var item = (Header as DependencyObject)?.GetParent<PivotHeaderItem>();
+                    if (item != null)
+                    {
+                        item.RenderTransform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
+                    }
+
                     OnPropertyChanged(Prism.UI.Visual.RenderTransformProperty);
                 }
             }
@@ -305,46 +324,104 @@ namespace Prism.Windows.UI.Controls
         /// <summary>
         /// Gets the element that displays the image of the tab.
         /// </summary>
-        protected global::Windows.UI.Xaml.Controls.Image Image { get; }
+        protected global::Windows.UI.Xaml.Controls.Image ImageElement { get; }
+
+        /// <summary>
+        /// Gets the element that displays the colored rectangle on the bottom when the tab is selected.
+        /// </summary>
+        protected global::Windows.UI.Xaml.Shapes.Rectangle RectangleElement { get; }
 
         /// <summary>
         /// Gets the element that displays the title text of the tab.
         /// </summary>
         protected TextBlock TextBlock { get; }
 
+        private long callbackToken;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TabItem"/> class.
         /// </summary>
         public TabItem()
         {
-            Children.Add(Image = new global::Windows.UI.Xaml.Controls.Image()
+            var stackPanel = new StackPanel()
             {
-                Height = 48,
-                Width = 48,
+                MinWidth = 96,
+                Orientation = Orientation.Vertical,
+                VerticalAlignment = VerticalAlignment.Bottom
+            };
+            Header = stackPanel;
+
+            stackPanel.Children.Add(ImageElement = new global::Windows.UI.Xaml.Controls.Image()
+            {
+                Height = 24,
+                Width = 24,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Margin = new global::Windows.UI.Xaml.Thickness(0, 0, 0, 6),
+                Name = "Icon",
                 Stretch = global::Windows.UI.Xaml.Media.Stretch.Uniform,
-                VerticalAlignment = VerticalAlignment.Center
+                Visibility = Visibility.Collapsed
             });
             
-            Children.Add(TextBlock = new TextBlock
+            stackPanel.Children.Add(TextBlock = new TextBlock
             {
+                FontSize = 1, // The default size is 15, but the rendered size is significantly larger unless we set it ourselves.
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Margin = new global::Windows.UI.Xaml.Thickness(0, 0, 0, 6),
                 MaxLines = 1,
-                TextTrimming = TextTrimming.CharacterEllipsis,
-                VerticalAlignment = VerticalAlignment.Center
+                Name = "Title",
+                TextTrimming = TextTrimming.CharacterEllipsis
             });
 
-            HorizontalAlignment = HorizontalAlignment.Stretch;
-            MinHeight = 48;
-            Orientation = Orientation.Horizontal;
-            RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
+            stackPanel.Children.Add(RectangleElement = new global::Windows.UI.Xaml.Shapes.Rectangle()
+            {
+                Height = 2,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                Name = "Rect",
+                Opacity = 0
+            });
+
+            stackPanel.Tapped += (o, e) =>
+            {
+                this.GetParent<TabView>()?.OnTabItemClicked(this);
+            };
+
+            // Doing this sucks, but not doing it throws a non-sensical exception
+            Style = (Style)XamlReader.Load(@"<Style TargetType=""ContentControl"" xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation"" xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
+                <Setter Property=""Background"" Value=""Transparent"" />
+                <Setter Property=""Margin"" Value=""0""/>
+                <Setter Property=""Padding"" Value=""0"" />
+                <Setter Property=""HorizontalContentAlignment"" Value=""Stretch"" />
+                <Setter Property=""VerticalContentAlignment"" Value=""Stretch"" />
+                <Setter Property=""IsTabStop"" Value=""False"" />
+                <Setter Property=""Template"">
+                  <Setter.Value>
+                    <ControlTemplate TargetType=""ContentControl"">
+                      <Grid Background=""{TemplateBinding Background}"" HorizontalAlignment=""{TemplateBinding HorizontalAlignment}"" VerticalAlignment=""{TemplateBinding VerticalAlignment}"">
+                        <VisualStateManager.VisualStateGroups>
+                          <VisualStateGroup x:Name=""Pivot"">
+                            <VisualState x:Name=""Right"" />
+                            <VisualState x:Name=""Left"" />
+                            <VisualState x:Name=""Center"" />
+                          </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <ContentPresenter HorizontalAlignment=""{TemplateBinding HorizontalContentAlignment}"" VerticalAlignment=""{TemplateBinding VerticalContentAlignment}"" ContentTemplate=""{TemplateBinding ContentTemplate}"" Content=""{TemplateBinding Content}"" Margin=""{TemplateBinding Padding}"" />
+                      </Grid>
+                    </ControlTemplate>
+                  </Setter.Value>
+                </Setter>
+            </Style>");
 
             base.Loaded += (o, e) =>
             {
-                var presenter = this.GetParent<ListViewItemPresenter>();
-                if (presenter != null)
+                var item = (Header as DependencyObject)?.GetParent<PivotHeaderItem>();
+                if (item != null)
                 {
-                    presenter.IsHitTestVisible = base.IsHitTestVisible;
-                    presenter.SelectedBackground = presenter.SelectedPointerOverBackground =
-                        presenter.GetParent<INativeTabView>()?.Foreground.GetBrush() ?? Windows.Resources.GetBrush(this, Windows.Resources.HighlightListAccentLowBrushId);
+                    item.VerticalContentAlignment = VerticalAlignment.Bottom;
+
+                    item.IsEnabled = isEnabled;
+                    item.IsHitTestVisible = isHitTestVisible;
+                    item.RenderTransform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
+                    item.RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
                 }
 
                 if (!IsLoaded)
@@ -373,7 +450,8 @@ namespace Prism.Windows.UI.Controls
         /// <returns>The desired size as a <see cref="Size"/> instance.</returns>
         public Size Measure(Size constraints)
         {
-            return base.MeasureOverride(constraints.GetSize()).GetSize();
+            base.MeasureOverride(constraints.GetSize());
+            return ((Header as FrameworkElement)?.DesiredSize ?? DesiredSize).GetSize();
         }
 
         /// <summary>
@@ -383,8 +461,15 @@ namespace Prism.Windows.UI.Controls
         protected override global::Windows.Foundation.Size ArrangeOverride(global::Windows.Foundation.Size finalSize)
         {
             ArrangeRequest(false, null);
-            finalSize = Frame.Size.GetSize();
             base.ArrangeOverride(finalSize);
+
+            var item = (Header as DependencyObject)?.GetParent<PivotHeaderItem>();
+            var panel = item?.GetParent<PivotHeaderPanel>();
+            if (panel != null)
+            {
+                item.Height = panel.Height;
+            }
+
             return finalSize;
         }
 
@@ -396,9 +481,9 @@ namespace Prism.Windows.UI.Controls
         /// Infinity can be specified as a value to indicate that the object will size to whatever content is available.</param>
         protected override global::Windows.Foundation.Size MeasureOverride(global::Windows.Foundation.Size availableSize)
         {
-            var desiredSize = MeasureRequest(false, null).GetSize();
-            base.MeasureOverride(desiredSize);
-            return desiredSize;
+            MeasureRequest(false, null);
+            base.MeasureOverride(availableSize);
+            return availableSize;
         }
 
         /// <summary>
