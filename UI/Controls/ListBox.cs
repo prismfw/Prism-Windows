@@ -462,7 +462,7 @@ namespace Prism.Windows.UI.Controls
         /// <summary>
         /// Initializes a new instance of the <see cref="ListBox"/> class.
         /// </summary>
-        public ListBox()
+        public ListBox(Prism.UI.Controls.ListBoxStyle style)
         {
             collectionSource = new CollectionViewSource();
             BindingOperations.SetBinding(this, ItemsSourceProperty, new Binding() { Source = collectionSource });
