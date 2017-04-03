@@ -572,10 +572,9 @@ namespace Prism.Windows.UI.Controls
             }
 
             var grid = GetTemplateChild("HorizontalTemplate") as Grid;
-            if (grid != null && grid.RowDefinitions.Count > 2)
+            if (grid != null)
             {
-                grid.RowDefinitions[0].Height = new global::Windows.UI.Xaml.GridLength(12);
-                grid.RowDefinitions[2].Height = new global::Windows.UI.Xaml.GridLength(12);
+                grid.MinHeight = 0;
             }
         }
 
