@@ -520,6 +520,8 @@ namespace Prism.Windows.UI.Controls
         }
         private Prism.UI.Visibility visibility;
 
+        private bool suppress;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SelectList"/> class.
         /// </summary>
@@ -578,8 +580,11 @@ namespace Prism.Windows.UI.Controls
 
             base.SelectionChanged += (o, e) =>
             {
-                OnPropertyChanged(Prism.UI.Controls.SelectList.SelectedIndexProperty);
-                SelectionChanged(this, new Prism.UI.Controls.SelectionChangedEventArgs(e.AddedItems.ToArray(), e.RemovedItems.ToArray()));
+                if (!suppress)
+                {
+                    OnPropertyChanged(Prism.UI.Controls.SelectList.SelectedIndexProperty);
+                    SelectionChanged(this, new Prism.UI.Controls.SelectionChangedEventArgs(e.AddedItems.ToArray(), e.RemovedItems.ToArray()));
+                }
             };
 
             LoadItemTemplate();
@@ -608,9 +613,12 @@ namespace Prism.Windows.UI.Controls
         /// </summary>
         public void RefreshDisplayItem()
         {
+            suppress = true;
             int index = SelectedIndex;
             SelectedIndex = -1;
             SelectedIndex = index;
+            suppress = false;
+
             Width = frame.Width = double.NaN;
             Height = frame.Height = double.NaN;
             InvalidateMeasure();
@@ -672,6 +680,12 @@ namespace Prism.Windows.UI.Controls
         protected override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
+
+            var presenter = this.GetChild<ContentPresenter>(c => c.Name == "ContentPresenter");
+            if (presenter != null)
+            {
+                Grid.SetColumnSpan(presenter, 2);
+            }
 
             var glyph = this.GetChild<FontIcon>(c => c.Name == "DropDownGlyph");
             if (glyph != null)

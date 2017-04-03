@@ -122,10 +122,10 @@ namespace Prism.Windows
                         value = new Size(540, 620);
                         return true;
                     case SystemResourceKeyId.SelectListDisplayItemPadding:
-                        value = new Thickness(4, 2, 32, 4);
+                        value = new Thickness(6, 3, 32, 6);
                         return true;
                     case SystemResourceKeyId.SelectListListItemPadding:
-                        value = new Thickness(4, 2, 4, 4);
+                        value = new Thickness(4, 4, 4, 8);
                         return true;
                     case SystemResourceKeyId.ShouldAutomaticallyIndentSeparators:
                         value = false;
