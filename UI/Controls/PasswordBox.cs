@@ -253,7 +253,7 @@ namespace Prism.Windows.UI.Controls
                 var style = Element.FontStyle;
                 var weight = Element.FontWeight.Weight;
                 Element.SetFont(Element.FontFamily as Media.FontFamily, value);
-                this.GetChild<ContentControl>(c => c.Name == "PlaceholderTextContentPresenter")?.SetFont(base.FontFamily as Media.FontFamily, value);
+                this.GetChild<ContentControl>(c => c.Name == "PlaceholderTextContentPresenter")?.SetFont(Element.FontFamily as Media.FontFamily, value);
 
                 if (Element.FontStyle != style || Element.FontWeight.Weight != weight)
                 {
@@ -434,6 +434,8 @@ namespace Prism.Windows.UI.Controls
         /// </summary>
         protected global::Windows.UI.Xaml.Controls.PasswordBox Element { get; }
 
+        private bool isInitialized;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PasswordBox"/> class.
         /// </summary>
@@ -456,6 +458,24 @@ namespace Prism.Windows.UI.Controls
 
             base.Loaded += (o, e) =>
             {
+                if (!isInitialized)
+                {
+                    isInitialized = true;
+
+                    var sv = Element.GetChild<global::Windows.UI.Xaml.Controls.ScrollViewer>(c => c.Name == "ContentElement");
+                    if (sv != null)
+                    {
+                        sv.VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Center;
+                    }
+
+                    var cc = Element.GetChild<ContentControl>(c => c.Name == "PlaceholderTextContentPresenter");
+                    if (cc != null)
+                    {
+                        cc.SetFont(Element.FontFamily as Media.FontFamily, FontStyle);
+                        cc.FontSize = FontSize;
+                    }
+                }
+
                 IsLoaded = true;
                 OnPropertyChanged(Prism.UI.Visual.IsLoadedProperty);
                 Loaded(this, EventArgs.Empty);
@@ -568,23 +588,6 @@ namespace Prism.Windows.UI.Controls
             var desiredSize = MeasureRequest(false, null).GetSize();
             base.MeasureOverride(desiredSize);
             return desiredSize;
-        }
-
-        /// <summary>
-        /// Invoked whenever application code or internal processes (such as a rebuilding layout pass) call ApplyTemplate.
-        /// In simplest terms, this means the method is called just before a UI element displays in your app.
-        /// Override this method to influence the default post-template logic of a class.
-        /// </summary>
-        protected override void OnApplyTemplate()
-        {
-            base.OnApplyTemplate();
-
-            var cc = this.GetChild<ContentControl>(c => c.Name == "PlaceholderTextContentPresenter");
-            if (cc != null)
-            {
-                cc.SetFont(base.FontFamily as Media.FontFamily, FontStyle);
-                cc.FontSize = FontSize;
-            }
         }
 
         /// <summary>

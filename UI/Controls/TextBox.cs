@@ -594,6 +594,12 @@ namespace Prism.Windows.UI.Controls
         protected override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
+
+            var sv = this.GetChild<global::Windows.UI.Xaml.Controls.ScrollViewer>(c => c.Name == "ContentElement");
+            if (sv != null)
+            {
+                sv.VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Center;
+            }
             
             var cc = this.GetChild<ContentControl>(c => c.Name == "PlaceholderTextContentPresenter");
             if (cc != null)
