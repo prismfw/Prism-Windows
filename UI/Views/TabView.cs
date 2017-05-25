@@ -52,7 +52,7 @@ namespace Prism.Windows.UI
         /// <summary>
         /// Occurs when a tab item is selected.
         /// </summary>
-        public event EventHandler<NativeItemSelectedEventArgs> TabItemSelected;
+        public event EventHandler<NativeItemChangedEventArgs> TabItemSelected;
 
         /// <summary>
         /// Occurs when this instance has been detached from the visual tree.
@@ -294,7 +294,7 @@ namespace Prism.Windows.UI
                     SetSelectedForeground();
 
                     OnPropertyChanged(Prism.UI.TabView.SelectedIndexProperty);
-                    TabItemSelected(this, new NativeItemSelectedEventArgs(oldTab, newTab));
+                    TabItemSelected(this, new NativeItemChangedEventArgs(oldTab, newTab));
                 }
                 else
                 {
@@ -399,7 +399,7 @@ namespace Prism.Windows.UI
             // This should only fire if the tab is already the active one.
             if (Element.SelectedIndex == TabItems.IndexOf(item))
             {
-                TabItemSelected(this, new NativeItemSelectedEventArgs(item, item));
+                TabItemSelected(this, new NativeItemChangedEventArgs(item, item));
             }
         }
 
