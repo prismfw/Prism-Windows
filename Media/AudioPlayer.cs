@@ -23,7 +23,7 @@ using System;
 using Prism.Native;
 using Windows.Media.Playback;
 
-namespace Prism.Windows.UI.Media
+namespace Prism.Windows.Media
 {
     /// <summary>
     /// Represents a Windows implementation for an <see cref="INativeAudioPlayer"/>.
@@ -39,7 +39,7 @@ namespace Prism.Windows.UI.Media
         /// <summary>
         /// Occurs when buffering of the audio track has finished.
         /// </summary>
-        public event EventHandler BufferingCompleted;
+        public event EventHandler BufferingEnded;
 
         /// <summary>
         /// Occurs when buffering of the audio track has begun.
@@ -49,7 +49,7 @@ namespace Prism.Windows.UI.Media
         /// <summary>
         /// Occurs when playback of the audio track has finished.
         /// </summary>
-        public event EventHandler PlaybackCompleted;
+        public event EventHandler PlaybackEnded;
 
         /// <summary>
         /// Occurs when playback of the audio track has begun.
@@ -122,7 +122,7 @@ namespace Prism.Windows.UI.Media
         /// </summary>
         public AudioPlayer()
         {
-            BackgroundMediaPlayer.Current.BufferingEnded += (o, e) => BufferingCompleted(this, EventArgs.Empty);
+            BackgroundMediaPlayer.Current.BufferingEnded += (o, e) => BufferingEnded(this, EventArgs.Empty);
 
             BackgroundMediaPlayer.Current.BufferingStarted += (o, e) => BufferingStarted(this, EventArgs.Empty);
 
@@ -134,7 +134,7 @@ namespace Prism.Windows.UI.Media
                 }
             };
 
-            BackgroundMediaPlayer.Current.MediaEnded += (o, e) => PlaybackCompleted(this, EventArgs.Empty);
+            BackgroundMediaPlayer.Current.MediaEnded += (o, e) => PlaybackEnded(this, EventArgs.Empty);
 
             BackgroundMediaPlayer.Current.MediaFailed += (o, e) => AudioFailed(this, new ErrorEventArgs(e.ExtendedErrorCode));
         }

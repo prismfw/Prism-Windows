@@ -152,7 +152,7 @@
     <Compile Include="UI\Shapes\Ellipse.cs" />
     <Compile Include="UI\Shapes\Line.cs" />
     <Compile Include="UI\StatusBar.cs" />
-    <Compile Include="UI\Media\AudioPlayer.cs" />
+    <Compile Include="Media\AudioPlayer.cs" />
     <Compile Include="UI\Media\Imaging\ImageCompositor.cs" />
     <Compile Include="UI\Media\Imaging\BitmapImage.cs" />
     <Compile Include="IO\Directory.cs" />
