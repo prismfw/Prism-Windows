@@ -20,12 +20,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 using System;
+using System.Runtime.InteropServices;
 using Prism.Native;
 using Prism.Systems;
 using Windows.Devices.Sensors;
 using Windows.Graphics.Display;
 using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Core;
+using Windows.Security.ExchangeActiveSyncProvisioning;
 using Windows.System.Power;
 using Windows.System.Profile;
 using Windows.UI.ViewManagement;
@@ -150,6 +152,11 @@ namespace Prism.Windows.Systems
         private bool isPowerMonitoringEnabled;
 
         /// <summary>
+        /// Gets the model of the device.
+        /// </summary>
+        public string Model { get; }
+
+        /// <summary>
         /// Gets the name of the device.
         /// </summary>
         public string Name
@@ -212,6 +219,19 @@ namespace Prism.Windows.Systems
             get { return PowerManager.BatteryStatus.GetPowerSource(); }
         }
 
+        /// <summary>
+        /// Gets the amount of time, in milliseconds, that the system has been awake since it was last restarted.
+        /// </summary>
+        public long SystemUptime
+        {
+            get
+            {
+                ulong time;
+                QueryUnbiasedInterruptTime(out time);
+                return (long)(time / 10000);
+            }
+        }
+
         private readonly SimpleOrientationSensor orientationSensor;
 
         /// <summary>
@@ -221,6 +241,8 @@ namespace Prism.Windows.Systems
         {
             OSVersion = SystemVersion ?? new Version(0, 0);
             SystemVersion = null;
+
+            Model = new EasClientDeviceInformation().SystemProductName;
 
             orientationSensor = SimpleOrientationSensor.GetDefault();
         }
@@ -239,5 +261,8 @@ namespace Prism.Windows.Systems
         {
             PowerSourceChanged(this, EventArgs.Empty);
         }
+
+        [DllImport("kernel32")]
+        extern static void QueryUnbiasedInterruptTime(out UInt64 value);
     }
 }
