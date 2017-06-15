@@ -247,12 +247,12 @@ namespace Prism.Windows
                     case SystemResourceKeyId.ToggleSwitchThumbOnBrush:
                         id = HighlightAltChromeWhiteBrushId;
                         break;
-                    case SystemResourceKeyId.LoadIndicatorBackgroundBrush:
                     case SystemResourceKeyId.TabViewBackgroundBrush:
                     case SystemResourceKeyId.ViewBackgroundBrush:
                     case SystemResourceKeyId.ViewHeaderBackgroundBrush:
                         id = PageBackgroundChromeLowBrushId;
                         break;
+                    case SystemResourceKeyId.LoadIndicatorBackgroundBrush:
                     case SystemResourceKeyId.SelectListListSeparatorBrush:
                         value = null;
                         return true;
