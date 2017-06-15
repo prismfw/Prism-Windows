@@ -86,16 +86,22 @@ namespace Prism.Windows.UI.Controls
                     if (areAnimationsEnabled)
                     {
                         Transitions = transitions;
+                        Canvas.Transitions = canvasTransitions;
+                        Canvas.ChildrenTransitions = canvasChildrenTransitions;
                         Element.Transitions = elementTransitions;
                         Element.ChildTransitions = elementChildTransitions;
                     }
                     else
                     {
                         transitions = Transitions;
+                        canvasTransitions = Canvas.Transitions;
+                        canvasChildrenTransitions = Canvas.ChildrenTransitions;
                         elementTransitions = Element.Transitions;
                         elementChildTransitions = Element.ChildTransitions;
 
                         Transitions = null;
+                        Canvas.Transitions = null;
+                        Canvas.ChildrenTransitions = null;
                         Element.Transitions = null;
                         Element.ChildTransitions = null;
                     }
@@ -105,7 +111,7 @@ namespace Prism.Windows.UI.Controls
             }
         }
         private bool areAnimationsEnabled = true;
-        private TransitionCollection transitions, elementTransitions, elementChildTransitions;
+        private TransitionCollection transitions, canvasTransitions, canvasChildrenTransitions, elementTransitions, elementChildTransitions;
 
         /// <summary>
         /// Gets or sets the method to invoke when this instance requests an arrangement of its children.
@@ -123,7 +129,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != background)
                 {
                     background = value;
-                    base.Background = background.GetBrush();
+                    Element.Background = background.GetBrush();
                     OnPropertyChanged(Prism.UI.Controls.Border.BackgroundProperty);
                 }
             }
@@ -212,7 +218,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != base.IsHitTestVisible)
                 {
                     base.IsHitTestVisible = value;
-                    OnPropertyChanged(Prism.UI.Visual.IsHitTestVisibleProperty);
+                    OnPropertyChanged(Visual.IsHitTestVisibleProperty);
                 }
             }
         }
@@ -325,13 +331,6 @@ namespace Prism.Windows.UI.Controls
         {
             RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
 
-            Children.Add(Canvas = new Canvas()
-            {
-                Background = new global::Windows.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Colors.Transparent),
-                HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Stretch,
-                VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Stretch,
-            });
-
             Children.Add(Element = new global::Windows.UI.Xaml.Controls.Border()
             {
                 Background = new global::Windows.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Colors.Transparent),
@@ -340,10 +339,17 @@ namespace Prism.Windows.UI.Controls
                 VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Stretch
             });
 
+            Children.Add(Canvas = new Canvas()
+            {
+                Background = new global::Windows.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Colors.Transparent),
+                HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Stretch,
+                VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Stretch
+            });
+
             base.Loaded += (o, e) =>
             {
                 IsLoaded = true;
-                OnPropertyChanged(Prism.UI.Visual.IsLoadedProperty);
+                OnPropertyChanged(Visual.IsLoadedProperty);
                 Loaded(this, EventArgs.Empty);
             };
 
@@ -374,7 +380,7 @@ namespace Prism.Windows.UI.Controls
             base.Unloaded += (o, e) =>
             {
                 IsLoaded = false;
-                OnPropertyChanged(Prism.UI.Visual.IsLoadedProperty);
+                OnPropertyChanged(Visual.IsLoadedProperty);
                 Unloaded(this, EventArgs.Empty);
             };
         }
