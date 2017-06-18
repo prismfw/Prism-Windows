@@ -134,14 +134,7 @@ namespace Prism.Windows.UI.Controls
         public new double FontSize
         {
             get { return Element.FontSize; }
-            set
-            {
-                if (value != Element.FontSize)
-                {
-                    Element.FontSize = value;
-                    OnPropertyChanged(Prism.UI.Controls.Label.FontSizeProperty);
-                }
-            }
+            set { Element.FontSize = value; }
         }
 
         /// <summary>
@@ -249,23 +242,6 @@ namespace Prism.Windows.UI.Controls
         /// Gets a value indicating whether this instance has been loaded and is ready for rendering.
         /// </summary>
         public bool IsLoaded { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the maximum number of lines of text that the label can show.
-        /// A value of 0 means there is no limit.
-        /// </summary>
-        public int Lines
-        {
-            get { return Element.MaxLines; }
-            set
-            {
-                if (value != Element.MaxLines)
-                {
-                    Element.MaxLines = value;
-                    OnPropertyChanged(Prism.UI.Controls.Label.LinesProperty);
-                }
-            }
-        }
 
         /// <summary>
         /// Gets or sets the method to invoke when this instance requests a measurement of itself and its children.
@@ -466,6 +442,15 @@ namespace Prism.Windows.UI.Controls
                 base.Visibility = visibility == Prism.UI.Visibility.Visible ?
                     global::Windows.UI.Xaml.Visibility.Visible : global::Windows.UI.Xaml.Visibility.Collapsed;
             }
+        }
+
+        /// <summary>
+        /// Sets the maximum number of lines of text that the label can show.  A value of 0 means there is no limit.
+        /// </summary>
+        /// <param name="maxLines"></param>
+        public void SetMaxLines(int maxLines)
+        {
+            Element.MaxLines = maxLines;
         }
 
         /// <summary>
