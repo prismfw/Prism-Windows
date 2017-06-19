@@ -20,6 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 using System;
+using System.Linq;
+using System.Text;
 using Prism.Input;
 using Prism.Native;
 using Prism.UI;
@@ -321,6 +323,24 @@ namespace Prism.Windows.UI.Controls
         public bool IsLoaded { get; private set; }
 
         /// <summary>
+        /// Gets or sets the maximum number of characters that are allowed to be entered into the control.
+        /// A value of 0 means there is no limit.
+        /// </summary>
+        public new int MaxLength
+        {
+            get { return base.MaxLength; }
+            set
+            {
+                if (value != base.MaxLength)
+                {
+                    base.MaxLength = value;
+                    OnPropertyChanged(Prism.UI.Controls.TextArea.MaxLengthProperty);
+                    base.Text = TruncateToMaxLength(base.Text);
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the maximum number of lines of text that should be shown.
         /// </summary>
         public int MaxLines
@@ -370,7 +390,7 @@ namespace Prism.Windows.UI.Controls
                 if (value != base.Opacity)
                 {
                     base.Opacity = value;
-                    OnPropertyChanged(Prism.UI.Element.OpacityProperty);
+                    OnPropertyChanged(Element.OpacityProperty);
                 }
             }
         }
@@ -430,7 +450,7 @@ namespace Prism.Windows.UI.Controls
                 value = value ?? string.Empty;
                 if (value != base.Text)
                 {
-                    base.Text = value;
+                    base.Text = TruncateToMaxLength(value);
                 }
             }
         }
@@ -466,7 +486,7 @@ namespace Prism.Windows.UI.Controls
                     base.Visibility = visibility == Prism.UI.Visibility.Visible ?
                         global::Windows.UI.Xaml.Visibility.Visible : global::Windows.UI.Xaml.Visibility.Collapsed;
 
-                    OnPropertyChanged(Prism.UI.Element.VisibilityProperty);
+                    OnPropertyChanged(Element.VisibilityProperty);
                 }
             }
         }
@@ -688,6 +708,32 @@ namespace Prism.Windows.UI.Controls
         protected virtual void OnPropertyChanged(PropertyDescriptor pd)
         {
             PropertyChanged(this, new FrameworkPropertyChangedEventArgs(pd));
+        }
+
+        private string TruncateToMaxLength(string value)
+        {
+            if (base.MaxLength > 0 && value != null && value.Length - value.Count(c => c == '\r') > base.MaxLength)
+            {
+                int charCount = 0;
+                var builder = new StringBuilder(base.MaxLength);
+                foreach (var c in value)
+                {
+                    builder.Append(c);
+                    if (c != '\r')
+                    {
+                        charCount++;
+                    }
+
+                    if (charCount == base.MaxLength)
+                    {
+                        break;
+                    }
+                }
+
+                return builder.ToString();
+            }
+
+            return value;
         }
     }
 }

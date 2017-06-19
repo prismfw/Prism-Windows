@@ -321,6 +321,28 @@ namespace Prism.Windows.UI.Controls
         public bool IsLoaded { get; private set; }
 
         /// <summary>
+        /// Gets or sets the maximum number of characters that are allowed to be entered into the control.
+        /// A value of 0 means there is no limit.
+        /// </summary>
+        public new int MaxLength
+        {
+            get { return base.MaxLength; }
+            set
+            {
+                if (value != base.MaxLength)
+                {
+                    base.MaxLength = value;
+                    OnPropertyChanged(Prism.UI.Controls.TextBox.MaxLengthProperty);
+
+                    if (base.MaxLength > 0 && base.Text != null && base.Text.Length > base.MaxLength)
+                    {
+                        base.Text = base.Text.Substring(0, base.MaxLength);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the method to invoke when this instance requests a measurement of itself and its children.
         /// </summary>
         public MeasureRequestHandler MeasureRequest { get; set; }
@@ -396,7 +418,7 @@ namespace Prism.Windows.UI.Controls
                 value = value ?? string.Empty;
                 if (value != base.Text)
                 {
-                    base.Text = value;
+                    base.Text = base.MaxLength > 0 && value != null && value.Length > base.MaxLength ? value.Substring(0, base.MaxLength) : value;
                 }
             }
         }

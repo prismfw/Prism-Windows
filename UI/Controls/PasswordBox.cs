@@ -24,6 +24,7 @@ using Prism.Input;
 using Prism.Native;
 using Prism.UI;
 using Prism.UI.Media;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
 
@@ -319,13 +320,35 @@ namespace Prism.Windows.UI.Controls
         /// </summary>
         public bool IsFocused
         {
-            get { return FocusState != global::Windows.UI.Xaml.FocusState.Unfocused; }
+            get { return Element.FocusState != global::Windows.UI.Xaml.FocusState.Unfocused; }
         }
 
         /// <summary>
         /// Gets a value indicating whether this instance has been loaded and is ready for rendering.
         /// </summary>
         public bool IsLoaded { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the maximum number of characters that are allowed to be entered into the control.
+        /// A value of 0 means there is no limit.
+        /// </summary>
+        public int MaxLength
+        {
+            get { return Element.MaxLength; }
+            set
+            {
+                if (value != Element.MaxLength)
+                {
+                    Element.MaxLength = value;
+                    OnPropertyChanged(Prism.UI.Controls.PasswordBox.MaxLengthProperty);
+
+                    if (Element.MaxLength > 0 && Element.Password != null && Element.Password.Length > Element.MaxLength)
+                    {
+                        Element.Password = Element.Password.Substring(0, Element.MaxLength);
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets the method to invoke when this instance requests a measurement of itself and its children.
@@ -359,7 +382,7 @@ namespace Prism.Windows.UI.Controls
                 value = value ?? string.Empty;
                 if (value != Element.Password)
                 {
-                    Element.Password = value;
+                    Element.Password = Element.MaxLength > 0 && value != null && value.Length > Element.MaxLength ? value.Substring(0, Element.MaxLength) : value;
                 }
             }
         }
@@ -477,7 +500,7 @@ namespace Prism.Windows.UI.Controls
                 }
 
                 IsLoaded = true;
-                OnPropertyChanged(Prism.UI.Visual.IsLoadedProperty);
+                OnPropertyChanged(Visual.IsLoadedProperty);
                 Loaded(this, EventArgs.Empty);
             };
 
@@ -514,7 +537,7 @@ namespace Prism.Windows.UI.Controls
             base.Unloaded += (o, e) =>
             {
                 IsLoaded = false;
-                OnPropertyChanged(Prism.UI.Visual.IsLoadedProperty);
+                OnPropertyChanged(Visual.IsLoadedProperty);
                 Unloaded(this, EventArgs.Empty);
             };
         }
@@ -524,7 +547,7 @@ namespace Prism.Windows.UI.Controls
         /// </summary>
         public void Focus()
         {
-            base.Focus(global::Windows.UI.Xaml.FocusState.Programmatic);
+            Element.Focus(global::Windows.UI.Xaml.FocusState.Programmatic);
         }
 
         /// <summary>
@@ -557,12 +580,12 @@ namespace Prism.Windows.UI.Controls
         {
             if (IsFocused)
             {
-                bool tabStop = IsTabStop;
-                bool enabled = IsEnabled;
-                IsTabStop = false;
-                IsEnabled = false;
-                IsEnabled = enabled;
-                IsTabStop = tabStop;
+                bool tabStop = Element.IsTabStop;
+                bool enabled = Element.IsEnabled;
+                Element.IsTabStop = false;
+                Element.IsEnabled = false;
+                Element.IsEnabled = enabled;
+                Element.IsTabStop = tabStop;
             }
         }
 
