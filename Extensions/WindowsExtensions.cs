@@ -221,6 +221,74 @@ namespace Prism.Windows
         }
 
         /// <summary>
+        /// Gets an <see cref="InputScope"/> from an <see cref="InputType"/>.
+        /// </summary>
+        /// <param name="inputType">The input type.</param>
+        public static InputScope GetInputScope(this InputType inputType)
+        {
+            InputScopeNameValue value;
+            switch (inputType)
+            {
+                case InputType.Alphanumeric:
+                    value = InputScopeNameValue.Default;
+                    break;
+                case InputType.Number:
+                    value = InputScopeNameValue.Number;
+                    break;
+                case InputType.NumberAndSymbol:
+                    value = InputScopeNameValue.CurrencyAmountAndSymbol;
+                    break;
+                case InputType.Phone:
+                    value = InputScopeNameValue.TelephoneNumber;
+                    break;
+                case InputType.Url:
+                    value = InputScopeNameValue.Url;
+                    break;
+                case InputType.EmailAddress:
+                    value = InputScopeNameValue.EmailSmtpAddress;
+                    break;
+                default:
+                    value = (InputScopeNameValue)((int)inputType - 6);
+                    break;
+            }
+
+            return new InputScope()
+            {
+                Names = { new InputScopeName(value) }
+            };
+        }
+
+        /// <summary>
+        /// Gets an <see cref="InputType"/> from an <see cref="InputScope"/>.
+        /// </summary>
+        /// <param name="inputScope">The input scope.</param>
+        public static InputType GetInputType(this InputScope inputScope)
+        {
+            if (!(inputScope?.Names?.Count > 0))
+            {
+                return InputType.Alphanumeric;
+            }
+
+            switch (inputScope.Names[0].NameValue)
+            {
+                case InputScopeNameValue.Default:
+                    return InputType.Alphanumeric;
+                case InputScopeNameValue.Number:
+                    return InputType.Number;
+                case InputScopeNameValue.CurrencyAmountAndSymbol:
+                    return InputType.NumberAndSymbol;
+                case InputScopeNameValue.TelephoneNumber:
+                    return InputType.Phone;
+                case InputScopeNameValue.Url:
+                    return InputType.Url;
+                case InputScopeNameValue.EmailSmtpAddress:
+                    return InputType.EmailAddress;
+                default:
+                    return (InputType)((int)inputScope.Names[0].NameValue + 6);
+            }
+        }
+
+        /// <summary>
         /// Gets a <see cref="global::Windows.UI.Xaml.Media.Matrix"/> from a <see cref="Prism.UI.Media.Matrix"/>.
         /// </summary>
         /// <param name="matrix">The matrix.</param>

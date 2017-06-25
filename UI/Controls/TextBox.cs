@@ -292,6 +292,22 @@ namespace Prism.Windows.UI.Controls
         private Rectangle frame = new Rectangle();
 
         /// <summary>
+        /// Gets or sets the type of text that the user is expected to input.
+        /// </summary>
+        public InputType InputType
+        {
+            get { return InputScope.GetInputType(); }
+            set
+            {
+                if (value != InputScope.GetInputType())
+                {
+                    InputScope = value.GetInputScope();
+                    OnPropertyChanged(Prism.UI.Controls.TextBox.InputTypeProperty);
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether this instance can be considered a valid result for hit testing.
         /// </summary>
         public new bool IsHitTestVisible

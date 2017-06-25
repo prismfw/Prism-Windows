@@ -24,8 +24,8 @@ using Prism.Input;
 using Prism.Native;
 using Prism.UI;
 using Prism.UI.Media;
-using Windows.ApplicationModel.DataTransfer;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Animation;
 
 namespace Prism.Windows.UI.Controls
@@ -298,6 +298,24 @@ namespace Prism.Windows.UI.Controls
             }
         }
         private Rectangle frame = new Rectangle();
+
+        /// <summary>
+        /// Gets or sets the type of text that the user is expected to input.
+        /// </summary>
+        public InputType InputType
+        {
+            get { return inputType; }
+            set
+            {
+                if (value != inputType)
+                {
+                    inputType = value;
+                    Element.InputScope = new InputScope() { Names = { new InputScopeName(value == InputType.Number ? InputScopeNameValue.NumericPin : InputScopeNameValue.Password) } };
+                    OnPropertyChanged(Prism.UI.Controls.PasswordBox.InputTypeProperty);
+                }
+            }
+        }
+        private InputType inputType;
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance can be considered a valid result for hit testing.
