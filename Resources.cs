@@ -178,6 +178,7 @@ namespace Prism.Windows
                         id = HighlightAccentBrushId;
                         break;
                     case SystemResourceKeyId.ActionMenuBackgroundBrush:
+                    case SystemResourceKeyId.FlyoutBackgroundBrush:
                     case SystemResourceKeyId.SelectListListBackgroundBrush:
                         id = BackgroundChromeMediumLowBrushId;
                         break;
@@ -185,6 +186,7 @@ namespace Prism.Windows
                     case SystemResourceKeyId.ButtonForegroundBrush:
                     case SystemResourceKeyId.DateTimePickerForegroundBrush:
                     case SystemResourceKeyId.DetailLabelForegroundBrush:
+                    case SystemResourceKeyId.MenuFlyoutForegroundBrush:
                     case SystemResourceKeyId.SearchBoxForegroundBrush:
                     case SystemResourceKeyId.SelectListForegroundBrush:
                     case SystemResourceKeyId.TextBoxForegroundBrush:

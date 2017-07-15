@@ -25,12 +25,14 @@ using Prism.Input;
 using Prism.Native;
 using Prism.Systems;
 using Prism.UI;
+using Prism.UI.Controls;
 using Prism.Windows.UI.Media;
 using Prism.Windows.UI.Media.Imaging;
 using Windows.Devices.Input;
 using Windows.System.Power;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Imaging;
 
@@ -172,6 +174,28 @@ namespace Prism.Windows
                     return ElementTheme.Light;
                 default:
                     return ElementTheme.Default;
+            }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="FlyoutPlacementMode"/> from a <see cref="FlyoutPlacement"/>.
+        /// </summary>
+        /// <param name="placement">The flyout placement.</param>
+        public static FlyoutPlacementMode GetFlyoutPlacementMode(this FlyoutPlacement placement)
+        {
+            switch (placement)
+            {
+                case FlyoutPlacement.Bottom:
+                    return FlyoutPlacementMode.Bottom;
+                case FlyoutPlacement.Left:
+                    return FlyoutPlacementMode.Left;
+                case FlyoutPlacement.Right:
+                    return FlyoutPlacementMode.Right;
+                case FlyoutPlacement.Top:
+                case FlyoutPlacement.Auto:
+                    return FlyoutPlacementMode.Top;
+                default:
+                    return (FlyoutPlacementMode)(placement - 5);
             }
         }
 

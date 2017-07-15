@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 using System.Linq;
 using Prism.Native;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 
 namespace Prism.Windows.UI
 {
@@ -48,6 +49,18 @@ namespace Prism.Windows.UI
             if (dep == null)
             {
                 return 0;
+            }
+
+            var flyout = reference as Controls.Flyout;
+            if (flyout != null)
+            {
+                return flyout.Presenter == null ? 0 : 1;
+            }
+
+            var menuflyout = reference as Controls.MenuFlyout;
+            if (menuflyout != null)
+            {
+                return menuflyout.Presenter == null ? 0 : 1;
             }
 
             int count = 0;
@@ -80,6 +93,18 @@ namespace Prism.Windows.UI
                 return null;
             }
 
+            var flyout = reference as Controls.Flyout;
+            if (flyout != null)
+            {
+                return childIndex == 0 ? flyout.Presenter : null;
+            }
+
+            var menuflyout = reference as Controls.MenuFlyout;
+            if (menuflyout != null)
+            {
+                return childIndex == 0 ? menuflyout.Presenter : null;
+            }
+
             int childCount = global::Windows.UI.Xaml.Media.VisualTreeHelper.GetChildrenCount(dep);
             if (childIndex >= childCount)
             {
@@ -101,6 +126,12 @@ namespace Prism.Windows.UI
             if (window != null && window.Content == reference)
             {
                 return window;
+            }
+
+            FrameworkElement presenter = ((FrameworkElement)(reference as FlyoutPresenter) ?? reference as MenuFlyoutPresenter);
+            if (presenter?.Tag != null)
+            {
+                return presenter.Tag;
             }
 
             var dep = reference as DependencyObject;
