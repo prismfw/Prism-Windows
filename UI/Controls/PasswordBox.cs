@@ -347,6 +347,22 @@ namespace Prism.Windows.UI.Controls
         public bool IsLoaded { get; private set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the password is displayed in plain text.
+        /// </summary>
+        public bool IsPasswordVisible
+        {
+            get { return Element.PasswordRevealMode == PasswordRevealMode.Visible; }
+            set
+            {
+                if (value != IsPasswordVisible)
+                {
+                    Element.PasswordRevealMode = value ? PasswordRevealMode.Visible : PasswordRevealMode.Peek;
+                    OnPropertyChanged(Prism.UI.Controls.PasswordBox.IsPasswordVisibleProperty);
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the maximum number of characters that are allowed to be entered into the control.
         /// A value of 0 means there is no limit.
         /// </summary>
