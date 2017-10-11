@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 using System;
+using System.Linq;
 using Prism.Native;
 using Prism.UI;
 using Prism.UI.Controls;
@@ -116,13 +117,14 @@ namespace Prism.Windows.UI.Controls
         /// </summary>
         public new object Content
         {
-            get { return base.Content; }
+            get { return canvas.Children.FirstOrDefault(); }
             set
             {
                 var element = value as UIElement;
-                if (element != base.Content)
+                if (element != canvas.Children.FirstOrDefault())
                 {
-                    base.Content = element;
+                    canvas.Children.Clear();
+                    canvas.Children.Add(element);
                     OnPropertyChanged(Prism.UI.Controls.Flyout.ContentProperty);
                 }
             }
@@ -227,47 +229,49 @@ namespace Prism.Windows.UI.Controls
         }
         private Theme requestedTheme;
 
+        private readonly global::Windows.UI.Xaml.Controls.Canvas canvas;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Flyout"/> class.
         /// </summary>
         public Flyout()
         {
+            base.Content = canvas = new global::Windows.UI.Xaml.Controls.Canvas();
+
             base.Closed += (o, e) => Closed(this, EventArgs.Empty);
 
             base.Opened += (o, e) =>
             {
-                if (base.Content != null)
+                var presenter = base.Content.GetParent<FlyoutPresenter>();
+                if (presenter != Presenter)
                 {
-                    var presenter = base.Content.GetParent<FlyoutPresenter>();
-                    if (presenter != Presenter)
+                    if (Presenter != null)
                     {
-                        if (Presenter != null)
-                        {
-                            Presenter.LayoutUpdated -= OnLayoutUpdated;
-                            Presenter.Loaded -= OnLoaded;
-                            Presenter.Unloaded -= OnUnloaded;
-                        }
-
-                        Presenter = presenter;
-                        Presenter.Background = background.GetBrush();
-                        Presenter.IsHitTestVisible = isHitTestVisible;
-                        Presenter.Padding = new global::Windows.UI.Xaml.Thickness();
-                        Presenter.RenderTransform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
-                        Presenter.RequestedTheme = requestedTheme.GetElementTheme();
-                        Presenter.Tag = this;
-
-                        transitions = Presenter.Transitions;
-                        contentTransitions = Presenter.ContentTransitions;
-                        SetTransitions();
-
                         Presenter.LayoutUpdated -= OnLayoutUpdated;
                         Presenter.Loaded -= OnLoaded;
                         Presenter.Unloaded -= OnUnloaded;
-
-                        Presenter.LayoutUpdated += OnLayoutUpdated;
-                        Presenter.Loaded += OnLoaded;
-                        Presenter.Unloaded += OnUnloaded;
                     }
+
+                    Presenter = presenter;
+                    Presenter.Background = background.GetBrush();
+                    Presenter.IsHitTestVisible = isHitTestVisible;
+                    Presenter.Padding = new global::Windows.UI.Xaml.Thickness();
+                    Presenter.RenderTransform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
+                    Presenter.RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
+                    Presenter.RequestedTheme = requestedTheme.GetElementTheme();
+                    Presenter.Tag = this;
+
+                    transitions = Presenter.Transitions;
+                    contentTransitions = Presenter.ContentTransitions;
+                    SetTransitions();
+
+                    Presenter.LayoutUpdated -= OnLayoutUpdated;
+                    Presenter.Loaded -= OnLoaded;
+                    Presenter.Unloaded -= OnUnloaded;
+
+                    Presenter.LayoutUpdated += OnLayoutUpdated;
+                    Presenter.Loaded += OnLoaded;
+                    Presenter.Unloaded += OnUnloaded;
                 }
 
                 Opened(this, EventArgs.Empty);
@@ -323,6 +327,9 @@ namespace Prism.Windows.UI.Controls
         {
             MeasureRequest(false, null);
             ArrangeRequest(false, null);
+
+            canvas.Width = Frame.Width;
+            canvas.Height = Frame.Height;
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
