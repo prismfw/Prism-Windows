@@ -220,6 +220,25 @@ namespace Prism.Windows
         }
 
         /// <summary>
+        /// Gets an <see cref="HoldingState"/> from a <see cref="global::Windows.UI.Input.HoldingState"/>.
+        /// </summary>
+        /// <param name="state">The holding state.</param>
+        public static HoldingState GetHoldingState(this global::Windows.UI.Input.HoldingState state)
+        {
+            switch (state)
+            {
+                case global::Windows.UI.Input.HoldingState.Started:
+                    return HoldingState.Started;
+                case global::Windows.UI.Input.HoldingState.Completed:
+                    return HoldingState.Completed;
+                case global::Windows.UI.Input.HoldingState.Canceled:
+                    return HoldingState.Canceled;
+                default:
+                    return (HoldingState)state;
+            }
+        }
+
+        /// <summary>
         /// Gets a <see cref="BitmapImage"/> from an <see cref="INativeImageSource"/>.
         /// </summary>
         /// <param name="source">The image.</param>
