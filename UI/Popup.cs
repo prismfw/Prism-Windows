@@ -126,10 +126,8 @@ namespace Prism.Windows.UI
             {
                 frame = value;
 
-                Element.HorizontalOffset = frame.X;
-                Element.VerticalOffset = frame.Y;
-                Element.Width = base.Width = value.Width;
-                Element.Height = base.Height = value.Height;
+                Width = value.Width;
+                Height = value.Height;
             }
         }
         private Rectangle frame = new Rectangle();
@@ -161,13 +159,6 @@ namespace Prism.Windows.UI
                 if (value != Element.IsLightDismissEnabled)
                 {
                     Element.IsLightDismissEnabled = value;
-                    if (Element.IsOpen)
-                    {
-                        // bit of a hack here, but changes to the property don't take effect until the popup is reopened
-                        suppressNotifications = true;
-                        Element.IsOpen = false;
-                        Element.IsOpen = true;
-                    }
                     OnPropertyChanged(Prism.UI.Popup.IsLightDismissEnabledProperty);
                 }
             }
@@ -215,40 +206,49 @@ namespace Prism.Windows.UI
         /// </summary>
         protected global::Windows.UI.Xaml.Controls.Primitives.Popup Element { get; }
 
-        private bool suppressNotifications;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Popup"/> class.
         /// </summary>
         public Popup()
         {
             Background = Windows.Resources.GetBrush(this, Windows.Resources.PageBackgroundChromeLowBrushId);
+            HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Center;
             RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
+            VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Center;
 
-            Element = new global::Windows.UI.Xaml.Controls.Primitives.Popup() { Child = this };
+            var grid = new Grid()
+            {
+                Background = new global::Windows.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Colors.Black) { Opacity = 0.6 },
+                Children = { this },
+                Height = global::Windows.UI.Xaml.Window.Current.Bounds.Height,
+                Width = global::Windows.UI.Xaml.Window.Current.Bounds.Width
+            };
+
+            grid.PointerPressed += (o, e) =>
+            {
+                if (IsLightDismissEnabled)
+                {
+                    Element.IsOpen = false;
+                }
+            };
+
+            Element = new global::Windows.UI.Xaml.Controls.Primitives.Popup() { Child = grid };
 
             Element.Closed += (o, e) =>
             {
-                if (!suppressNotifications)
-                {
-                    Closed(this, EventArgs.Empty);
-                }
+                Closed(this, EventArgs.Empty);
             };
 
             Element.Loaded += (o, e) =>
             {
-                IsLoaded = false;
+                IsLoaded = true;
                 OnPropertyChanged(Visual.IsLoadedProperty);
                 Loaded(this, EventArgs.Empty);
             };
 
             Element.Opened += (o, e) =>
             {
-                if (!suppressNotifications)
-                {
-                    Opened(this, EventArgs.Empty);
-                }
-                suppressNotifications = false;
+                Opened(this, EventArgs.Empty);
             };
 
             Element.Unloaded += (o, e) =>
@@ -256,6 +256,16 @@ namespace Prism.Windows.UI
                 IsLoaded = false;
                 OnPropertyChanged(Visual.IsLoadedProperty);
                 Unloaded(this, EventArgs.Empty);
+            };
+
+            global::Windows.UI.Xaml.Window.Current.SizeChanged += (o, e) =>
+            {
+                var child = Element.Child as FrameworkElement;
+                if (child != null)
+                {
+                    child.Width = e.Size.Width;
+                    child.Height = e.Size.Height;
+                }
             };
         }
 
