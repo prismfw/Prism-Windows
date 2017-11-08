@@ -321,8 +321,10 @@ namespace Prism.Windows.UI.Controls
             {
                 Content = (presenter = new ScrollViewerContentPresenter()),
                 HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Stretch,
+                HorizontalContentAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Stretch,
                 Padding = new global::Windows.UI.Xaml.Thickness(0, 0, 0, 0),
                 VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Stretch,
+                VerticalContentAlignment = global::Windows.UI.Xaml.VerticalAlignment.Stretch,
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto
             };
             base.Content = Element;
@@ -342,26 +344,34 @@ namespace Prism.Windows.UI.Controls
 
             base.PointerCanceled += (o, e) =>
             {
-                e.Handled = true;
-                PointerCanceled(this, e.GetPointerEventArgs(this));
+                if ((e.OriginalSource as DependencyObject).GetNearestElement() == this)
+                {
+                    PointerCanceled(this, e.GetPointerEventArgs(this));
+                }
             };
 
             base.PointerMoved += (o, e) =>
             {
-                e.Handled = true;
-                PointerMoved(this, e.GetPointerEventArgs(this));
+                if ((e.OriginalSource as DependencyObject).GetNearestElement() == this)
+                {
+                    PointerMoved(this, e.GetPointerEventArgs(this));
+                }
             };
 
             base.PointerPressed += (o, e) =>
             {
-                e.Handled = true;
-                PointerPressed(this, e.GetPointerEventArgs(this));
+                if ((e.OriginalSource as DependencyObject).GetNearestElement() == this)
+                {
+                    PointerPressed(this, e.GetPointerEventArgs(this));
+                }
             };
 
             base.PointerReleased += (o, e) =>
             {
-                e.Handled = true;
-                PointerReleased(this, e.GetPointerEventArgs(this));
+                if ((e.OriginalSource as DependencyObject).GetNearestElement() == this)
+                {
+                    PointerReleased(this, e.GetPointerEventArgs(this));
+                }
             };
 
             base.Unloaded += (o, e) =>

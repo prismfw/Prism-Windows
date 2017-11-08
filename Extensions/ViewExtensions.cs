@@ -91,5 +91,16 @@ namespace Prism.Windows
 
             return parent.GetParent<T>(predicate);
         }
+
+        internal static INativeElement GetNearestElement(this global::Windows.UI.Xaml.DependencyObject child)
+        {
+            var element = child as INativeElement;
+            if (element != null)
+            {
+                return element;
+            }
+
+            return GetNearestElement(VisualTreeHelper.GetParent(child));
+        }
     }
 }

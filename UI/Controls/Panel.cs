@@ -27,9 +27,9 @@ using Prism.Input;
 using Prism.Native;
 using Prism.UI;
 using Prism.UI.Media;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
-using UIElement = Windows.UI.Xaml.UIElement;
 
 namespace Prism.Windows.UI.Controls
 {
@@ -228,7 +228,7 @@ namespace Prism.Windows.UI.Controls
         /// <summary>
         /// Gets or sets the display state of the element.
         /// </summary>
-        public new Visibility Visibility
+        public new Prism.UI.Visibility Visibility
         {
             get { return visibility; }
             set
@@ -244,7 +244,7 @@ namespace Prism.Windows.UI.Controls
                 }
             }
         }
-        private Visibility visibility;
+        private Prism.UI.Visibility visibility;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Panel"/> class.
@@ -263,26 +263,34 @@ namespace Prism.Windows.UI.Controls
 
             base.PointerCanceled += (o, e) =>
             {
-                e.Handled = true;
-                PointerCanceled(this, e.GetPointerEventArgs(this));
+                if ((e.OriginalSource as DependencyObject).GetNearestElement() == this)
+                {
+                    PointerCanceled(this, e.GetPointerEventArgs(this));
+                }
             };
 
             base.PointerMoved += (o, e) =>
             {
-                e.Handled = true;
-                PointerMoved(this, e.GetPointerEventArgs(this));
+                if ((e.OriginalSource as DependencyObject).GetNearestElement() == this)
+                {
+                    PointerMoved(this, e.GetPointerEventArgs(this));
+                }
             };
 
             base.PointerPressed += (o, e) =>
             {
-                e.Handled = true;
-                PointerPressed(this, e.GetPointerEventArgs(this));
+                if ((e.OriginalSource as DependencyObject).GetNearestElement() == this)
+                {
+                    PointerPressed(this, e.GetPointerEventArgs(this));
+                }
             };
 
             base.PointerReleased += (o, e) =>
             {
-                e.Handled = true;
-                PointerReleased(this, e.GetPointerEventArgs(this));
+                if ((e.OriginalSource as DependencyObject).GetNearestElement() == this)
+                {
+                    PointerReleased(this, e.GetPointerEventArgs(this));
+                }
             };
 
             base.Unloaded += (o, e) =>

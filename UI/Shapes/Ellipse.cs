@@ -346,29 +346,10 @@ namespace Prism.Windows.UI.Shapes
                 Loaded(this, EventArgs.Empty);
             };
 
-            base.PointerCanceled += (o, e) =>
-            {
-                e.Handled = true;
-                PointerCanceled(this, e.GetPointerEventArgs(this));
-            };
-
-            base.PointerMoved += (o, e) =>
-            {
-                e.Handled = true;
-                PointerMoved(this, e.GetPointerEventArgs(this));
-            };
-
-            base.PointerPressed += (o, e) =>
-            {
-                e.Handled = true;
-                PointerPressed(this, e.GetPointerEventArgs(this));
-            };
-
-            base.PointerReleased += (o, e) =>
-            {
-                e.Handled = true;
-                PointerReleased(this, e.GetPointerEventArgs(this));
-            };
+            base.PointerCanceled += (o, e) => PointerCanceled(this, e.GetPointerEventArgs(this));
+            base.PointerMoved += (o, e) => PointerMoved(this, e.GetPointerEventArgs(this));
+            base.PointerPressed += (o, e) => PointerPressed(this, e.GetPointerEventArgs(this));
+            base.PointerReleased += (o, e) => PointerReleased(this, e.GetPointerEventArgs(this));
 
             base.Unloaded += (o, e) =>
             {

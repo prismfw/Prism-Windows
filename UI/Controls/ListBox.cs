@@ -549,26 +549,34 @@ namespace Prism.Windows.UI.Controls
 
             base.PointerCanceled += (o, e) =>
             {
-                e.Handled = true;
-                PointerCanceled(this, e.GetPointerEventArgs(this));
+                if ((e.OriginalSource as DependencyObject).GetNearestElement() == this)
+                {
+                    PointerCanceled(this, e.GetPointerEventArgs(this));
+                }
             };
 
             base.PointerMoved += (o, e) =>
             {
-                e.Handled = true;
-                PointerMoved(this, e.GetPointerEventArgs(this));
+                if ((e.OriginalSource as DependencyObject).GetNearestElement() == this)
+                {
+                    PointerMoved(this, e.GetPointerEventArgs(this));
+                }
             };
 
             base.PointerPressed += (o, e) =>
             {
-                e.Handled = true;
-                PointerPressed(this, e.GetPointerEventArgs(this));
+                if ((e.OriginalSource as DependencyObject).GetNearestElement() == this)
+                {
+                    PointerPressed(this, e.GetPointerEventArgs(this));
+                }
             };
 
             base.PointerReleased += (o, e) =>
             {
-                e.Handled = true;
-                PointerReleased(this, e.GetPointerEventArgs(this));
+                if ((e.OriginalSource as DependencyObject).GetNearestElement() == this)
+                {
+                    PointerReleased(this, e.GetPointerEventArgs(this));
+                }
             };
 
             base.SelectionChanged += (o, e) =>

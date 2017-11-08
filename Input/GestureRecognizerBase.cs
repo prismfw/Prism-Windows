@@ -47,22 +47,12 @@ namespace Prism.Windows.Input
         /// </summary>
         protected UIElement Target { get; private set; }
 
-        private readonly PointerEventHandler pointerCanceledHandler;
-        private readonly PointerEventHandler pointerMovedHandler;
-        private readonly PointerEventHandler pointerPressedHandler;
-        private readonly PointerEventHandler pointerReleasedHandler;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="GestureRecognizerBase"/> class.
         /// </summary>
         protected GestureRecognizerBase()
         {
             Recognizer = new GestureRecognizer();
-
-            pointerCanceledHandler = new PointerEventHandler(OnElementPointerCanceled);
-            pointerMovedHandler = new PointerEventHandler(OnElementPointerMoved);
-            pointerPressedHandler = new PointerEventHandler(OnElementPointerPressed);
-            pointerReleasedHandler = new PointerEventHandler(OnElementPointerReleased);
         }
 
         /// <summary>
@@ -74,10 +64,10 @@ namespace Prism.Windows.Input
             var element = target as UIElement;
             if (element != null)
             {
-                element.RemoveHandler(UIElement.PointerCanceledEvent, pointerCanceledHandler);
-                element.RemoveHandler(UIElement.PointerMovedEvent, pointerMovedHandler);
-                element.RemoveHandler(UIElement.PointerPressedEvent, pointerPressedHandler);
-                element.RemoveHandler(UIElement.PointerReleasedEvent, pointerReleasedHandler);
+                element.PointerCanceled -= OnElementPointerCanceled;
+                element.PointerMoved -= OnElementPointerMoved;
+                element.PointerPressed -= OnElementPointerPressed;
+                element.PointerReleased -= OnElementPointerReleased;
 
                 Target = null;
             }
@@ -94,17 +84,17 @@ namespace Prism.Windows.Input
             {
                 Target = element;
 
-                element.RemoveHandler(UIElement.PointerCanceledEvent, pointerCanceledHandler);
-                element.AddHandler(UIElement.PointerCanceledEvent, pointerCanceledHandler, true);
+                element.PointerCanceled -= OnElementPointerCanceled;
+                element.PointerCanceled += OnElementPointerCanceled;
 
-                element.RemoveHandler(UIElement.PointerMovedEvent, pointerMovedHandler);
-                element.AddHandler(UIElement.PointerMovedEvent, pointerMovedHandler, true);
+                element.PointerMoved -= OnElementPointerMoved;
+                element.PointerMoved += OnElementPointerMoved;
 
-                element.RemoveHandler(UIElement.PointerPressedEvent, pointerPressedHandler);
-                element.AddHandler(UIElement.PointerPressedEvent, pointerPressedHandler, true);
+                element.PointerPressed -= OnElementPointerPressed;
+                element.PointerPressed += OnElementPointerPressed;
 
-                element.RemoveHandler(UIElement.PointerReleasedEvent, pointerReleasedHandler);
-                element.AddHandler(UIElement.PointerReleasedEvent, pointerReleasedHandler, true);
+                element.PointerReleased -= OnElementPointerReleased;
+                element.PointerReleased += OnElementPointerReleased;
             }
         }
 
