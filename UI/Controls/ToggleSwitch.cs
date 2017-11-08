@@ -290,7 +290,7 @@ namespace Prism.Windows.UI.Controls
         /// </summary>
         public bool IsFocused
         {
-            get { return FocusState != global::Windows.UI.Xaml.FocusState.Unfocused; }
+            get { return Element.FocusState != global::Windows.UI.Xaml.FocusState.Unfocused; }
         }
 
         /// <summary>
@@ -446,6 +446,18 @@ namespace Prism.Windows.UI.Controls
                 Padding = new global::Windows.UI.Xaml.Thickness()
             };
 
+            Element.GotFocus += (o, e) =>
+            {
+                OnPropertyChanged(Prism.UI.Controls.Control.IsFocusedProperty);
+                GotFocus(this, EventArgs.Empty);
+            };
+
+            Element.LostFocus += (o, e) =>
+            {
+                OnPropertyChanged(Prism.UI.Controls.Control.IsFocusedProperty);
+                LostFocus(this, EventArgs.Empty);
+            };
+
             Element.Toggled += (o, e) =>
             {
                 OnPropertyChanged(Prism.UI.Controls.ToggleSwitch.ValueProperty);
@@ -484,7 +496,7 @@ namespace Prism.Windows.UI.Controls
         /// </summary>
         public void Focus()
         {
-            base.Focus(global::Windows.UI.Xaml.FocusState.Programmatic);
+            Element.Focus(global::Windows.UI.Xaml.FocusState.Programmatic);
         }
 
         /// <summary>
@@ -516,12 +528,12 @@ namespace Prism.Windows.UI.Controls
         {
             if (IsFocused)
             {
-                bool tabStop = IsTabStop;
-                bool enabled = IsEnabled;
-                IsTabStop = false;
-                IsEnabled = false;
-                IsEnabled = enabled;
-                IsTabStop = tabStop;
+                bool tabStop = Element.IsTabStop;
+                bool enabled = Element.IsEnabled;
+                Element.IsTabStop = false;
+                Element.IsEnabled = false;
+                Element.IsEnabled = enabled;
+                Element.IsTabStop = tabStop;
             }
         }
 
@@ -558,30 +570,6 @@ namespace Prism.Windows.UI.Controls
             var desiredSize = MeasureRequest(false, null).GetSize();
             base.MeasureOverride(desiredSize);
             return desiredSize;
-        }
-
-        /// <summary>
-        /// Called before the GotFocus event occurs.
-        /// </summary>
-        /// <param name="e">The data for the event.</param>
-        protected override void OnGotFocus(global::Windows.UI.Xaml.RoutedEventArgs e)
-        {
-            OnPropertyChanged(Prism.UI.Controls.Control.IsFocusedProperty);
-            GotFocus(this, EventArgs.Empty);
-
-            base.OnGotFocus(e);
-        }
-
-        /// <summary>
-        /// Called before the LostFocus event occurs.
-        /// </summary>
-        /// <param name="e">The data for the event.</param>
-        protected override void OnLostFocus(global::Windows.UI.Xaml.RoutedEventArgs e)
-        {
-            OnPropertyChanged(Prism.UI.Controls.Control.IsFocusedProperty);
-            LostFocus(this, EventArgs.Empty);
-
-            base.OnLostFocus(e);
         }
 
         /// <summary>

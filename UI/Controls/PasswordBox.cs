@@ -507,6 +507,24 @@ namespace Prism.Windows.UI.Controls
                 MinWidth = 0
             };
 
+            Element.GotFocus += (o, e) =>
+            {
+                OnPropertyChanged(Prism.UI.Controls.Control.IsFocusedProperty);
+                GotFocus(this, EventArgs.Empty);
+            };
+
+            Element.LostFocus += (o, e) =>
+            {
+                OnPropertyChanged(Prism.UI.Controls.Control.IsFocusedProperty);
+                LostFocus(this, EventArgs.Empty);
+            };
+
+            Element.PasswordChanged += (o, e) =>
+            {
+                OnPropertyChanged(Prism.UI.Controls.TextBox.TextProperty);
+                PasswordChanged(this, EventArgs.Empty);
+            };
+
             base.IsEnabledChanged += (o, e) =>
             {
                 Element.IsEnabled = IsEnabled;
@@ -536,12 +554,6 @@ namespace Prism.Windows.UI.Controls
                 IsLoaded = true;
                 OnPropertyChanged(Visual.IsLoadedProperty);
                 Loaded(this, EventArgs.Empty);
-            };
-
-            Element.PasswordChanged += (o, e) =>
-            {
-                OnPropertyChanged(Prism.UI.Controls.TextBox.TextProperty);
-                PasswordChanged(this, EventArgs.Empty);
             };
 
             base.PointerCanceled += (o, e) => PointerCanceled(this, e.GetPointerEventArgs(this));
