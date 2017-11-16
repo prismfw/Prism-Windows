@@ -272,6 +272,8 @@ namespace Prism.Windows.UI
 
             Children.Add((Header = new ViewStackHeader()) as UIElement);
             Children.Add(contentControl);
+            Canvas.SetZIndex(Children[0], 1);
+
             Orientation = global::Windows.UI.Xaml.Controls.Orientation.Vertical;
             RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
 
