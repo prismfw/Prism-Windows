@@ -375,8 +375,8 @@ namespace Prism.Windows
         public static PointerEventArgs GetPointerEventArgs(this PointerRoutedEventArgs args, UIElement source)
         {
             var pointerPoint = args.GetCurrentPoint(source);
-            return new PointerEventArgs(source, args.Pointer.PointerDeviceType.GetPointerType(), pointerPoint.Position.GetPoint(),
-                pointerPoint.Properties.Pressure * 2, (long)(pointerPoint.Timestamp / 1000));
+            return new PointerEventArgs(source, args.Pointer.PointerId, args.Pointer.PointerDeviceType.GetPointerType(),
+                pointerPoint.Position.GetPoint(), pointerPoint.Properties.Pressure * 2, (long)(pointerPoint.Timestamp / 1000));
         }
 
         /// <summary>
