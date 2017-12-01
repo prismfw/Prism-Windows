@@ -138,6 +138,7 @@
     <Compile Include="Media\MediaPlaybackList.cs" />
     <Compile Include="Resources.cs" />
     <Compile Include="Systems\Geolocation\Geolocator.cs" />
+    <Compile Include="Systems\Sensors\Accelerometer.cs" />
     <Compile Include="UI\Controls\MenuFlyout.cs" />
     <Compile Include="UI\Controls\Flyout.cs" />
     <Compile Include="UI\Controls\ActionMenu.cs" />
