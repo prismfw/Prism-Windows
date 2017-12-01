@@ -95,7 +95,7 @@ namespace Prism.Windows
         internal static INativeElement GetNearestElement(this global::Windows.UI.Xaml.DependencyObject child)
         {
             var element = child as INativeElement;
-            if (element != null)
+            if (element != null || child == null)
             {
                 return element;
             }
