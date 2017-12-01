@@ -184,7 +184,6 @@ namespace Prism.Windows.Systems
                     return DeviceOrientation.Unknown;
                 }
 
-                // Untested!!
                 var displayInfo = DisplayInformation.GetForCurrentView();
                 switch (orientationSensor.GetCurrentOrientation())
                 {
@@ -195,11 +194,11 @@ namespace Prism.Windows.Systems
                     case SimpleOrientation.NotRotated:
                         return displayInfo.NativeOrientation == DisplayOrientations.Landscape ? DeviceOrientation.LandscapeLeft : DeviceOrientation.PortraitUp;
                     case SimpleOrientation.Rotated90DegreesCounterclockwise:
-                        return displayInfo.NativeOrientation == DisplayOrientations.Landscape ? DeviceOrientation.LandscapeLeft : DeviceOrientation.PortraitDown;
+                        return displayInfo.NativeOrientation == DisplayOrientations.Landscape ? DeviceOrientation.PortraitDown : DeviceOrientation.LandscapeLeft;
                     case SimpleOrientation.Rotated180DegreesCounterclockwise:
                         return displayInfo.NativeOrientation == DisplayOrientations.Landscape ? DeviceOrientation.LandscapeRight : DeviceOrientation.PortraitDown;
                     case SimpleOrientation.Rotated270DegreesCounterclockwise:
-                        return displayInfo.NativeOrientation == DisplayOrientations.Landscape ? DeviceOrientation.LandscapeRight : DeviceOrientation.PortraitUp;
+                        return displayInfo.NativeOrientation == DisplayOrientations.Landscape ? DeviceOrientation.PortraitUp : DeviceOrientation.LandscapeRight;
                     default:
                         return DeviceOrientation.Unknown;
                 }
@@ -263,6 +262,6 @@ namespace Prism.Windows.Systems
         }
 
         [DllImport("kernel32")]
-        extern static void QueryUnbiasedInterruptTime(out UInt64 value);
+        private extern static void QueryUnbiasedInterruptTime(out UInt64 value);
     }
 }
