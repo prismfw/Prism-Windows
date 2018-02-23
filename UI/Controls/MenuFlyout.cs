@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017  Prism Framework Team
+Copyright (C) 2018  Prism Framework Team
 
 This file is part of the Prism Framework.
 
@@ -337,6 +337,7 @@ namespace Prism.Windows.UI.Controls
                         Presenter.IsHitTestVisible = isHitTestVisible;
                         Presenter.Padding = new global::Windows.UI.Xaml.Thickness();
                         Presenter.RenderTransform = renderTransform as Media.Transform ?? renderTransform as global::Windows.UI.Xaml.Media.Transform;
+                        Presenter.RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
                         Presenter.RequestedTheme = requestedTheme.GetElementTheme();
                         Presenter.Tag = this;
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017  Prism Framework Team
+Copyright (C) 2018  Prism Framework Team
 
 This file is part of the Prism Framework.
 
@@ -469,6 +469,7 @@ namespace Prism.Windows.UI.Controls
 
             RenderTransformOrigin = new global::Windows.Foundation.Point(0.5, 0.5);
             IsItemClickEnabled = true;
+            IsMultiSelectCheckBoxEnabled = false;
             GroupStyle.Add(new GroupStyle() { HidesIfEmpty = false });
             ItemContainerStyle = (Style)XamlReader.Load(@"
                 <Style xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation"" TargetType=""ListViewItem"">

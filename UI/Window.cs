@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017  Prism Framework Team
+Copyright (C) 2018  Prism Framework Team
 
 This file is part of the Prism Framework.
 
@@ -27,8 +27,6 @@ using Windows.Graphics.Display;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
-
-using DisplayOrientations = Windows.Graphics.Display.DisplayOrientations;
 
 namespace Prism.Windows.UI
 {
