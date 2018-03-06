@@ -146,6 +146,23 @@ namespace Prism.Windows.UI.Media.Imaging
         }
 
         /// <summary>
+        /// Creates a writable bitmap instance with a copy of the image data.
+        /// </summary>
+        /// <returns>The newly created <see cref="INativeWritableBitmap"/> instance.</returns>
+        public async Task<INativeWritableBitmap> CreateWritableCopyAsync()
+        {
+            if (!IsLoaded)
+            {
+                // if the image hasn't been loaded, force it
+                await SetSourceAsync(bitmapImage);
+            }
+
+            var bitmap = new WritableBitmap(bitmapImage.PixelWidth, bitmapImage.PixelHeight);
+            await SetSourceAsync(bitmap.Source as global::Windows.UI.Xaml.Media.Imaging.BitmapSource);
+            return bitmap;
+        }
+
+        /// <summary>
         /// Saves the image data to a file at the specified path using the specified file format.
         /// </summary>
         /// <param name="filePath">The path to the file in which to save the image data.</param>
@@ -169,17 +186,7 @@ namespace Prism.Windows.UI.Media.Imaging
             }
 
             var bitmap = new global::Windows.UI.Xaml.Media.Imaging.WriteableBitmap(bitmapImage.PixelWidth, bitmapImage.PixelHeight);
-            if (imageBytes != null)
-            {
-                await bitmap.SetSourceAsync(imageBytes.AsBuffer().AsStream().AsRandomAccessStream());
-            }
-            else if (SourceUri != null)
-            {
-                using (var stream = await RandomAccessStreamReference.CreateFromUri(SourceUri).OpenReadAsync())
-                {
-                    await bitmap.SetSourceAsync(stream);
-                }
-            }
+            await SetSourceAsync(bitmap);
 
             file = await folder.CreateFileAsync(Path.GetFileName(filePath), CreationCollisionOption.ReplaceExisting);
             using (var stream = await file.OpenAsync(FileAccessMode.ReadWrite))
@@ -235,6 +242,32 @@ namespace Prism.Windows.UI.Media.Imaging
 
             IsLoaded = true;
             ImageLoaded(this, EventArgs.Empty);
+        }
+
+        private async Task SetSourceAsync(global::Windows.UI.Xaml.Media.Imaging.BitmapSource source)
+        {
+            if (imageBytes != null)
+            {
+                await source.SetSourceAsync(imageBytes.AsBuffer().AsStream().AsRandomAccessStream());
+            }
+            else if (SourceUri != null)
+            {
+                if (SourceUri.IsFile)
+                {
+                    var file = await StorageFile.GetFileFromPathAsync(SourceUri.LocalPath);
+                    using (var stream = await RandomAccessStreamReference.CreateFromFile(file).OpenReadAsync())
+                    {
+                        await source.SetSourceAsync(stream);
+                    }
+                }
+                else
+                {
+                    using (var stream = await RandomAccessStreamReference.CreateFromUri(SourceUri).OpenReadAsync())
+                    {
+                        await source.SetSourceAsync(stream);
+                    }
+                }
+            }
         }
     }
 }
