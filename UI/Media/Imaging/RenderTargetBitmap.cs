@@ -28,7 +28,6 @@ using Prism.Native;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.UI.Xaml;
-using Windows.Storage.Streams;
 using Windows.Graphics.Display;
 
 namespace Prism.Windows.UI.Media.Imaging
@@ -87,18 +86,21 @@ namespace Prism.Windows.UI.Media.Imaging
         /// <returns>The image data as an <see cref="Array"/> of bytes.</returns>
         public async Task<byte[]> GetPixelsAsync()
         {
-            using (var stream = new InMemoryRandomAccessStream())
-            {
-                var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
-                encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied, (uint)renderTarget.PixelWidth, (uint)renderTarget.PixelHeight,
-                    96, 96, (await renderTarget.GetPixelsAsync()).ToArray());
+            var array = (await renderTarget.GetPixelsAsync()).ToArray();
 
-                await encoder.FlushAsync();
-                
-                byte[] pixels = new byte[stream.Size];
-                await stream.ReadAsync(pixels.AsBuffer(), (uint)stream.Size, InputStreamOptions.None);
-                return pixels;
+            // Convert from BGRA to ARGB
+            for (int i = 0; i < array.Length; i += 4)
+            {
+                byte swap = array[i];
+                array[i] = array[i + 3];
+                array[i + 3] = swap;
+
+                swap = array[i + 1];
+                array[i + 1] = array[i + 2];
+                array[i + 2] = swap;
             }
+
+            return array;
         }
 
         /// <summary>
